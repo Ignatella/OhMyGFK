@@ -12,9 +12,9 @@ void MyProject1MyFrame1::on_update(wxUpdateUIEvent& event)
 	wxClientDC dc(this->img_panel);
 	wxBufferedDC mdc(&dc);
 
-	if (!this->bitmaps.empty())
+	if (no_images > 0)
 	{
-		mdc.DrawBitmap(this->bitmaps[0], 0, 0);
+		mdc.DrawBitmap(current_bitmap, wxPoint());
 
 		if (mode == 1)
 		{
@@ -27,39 +27,41 @@ void MyProject1MyFrame1::on_update(wxUpdateUIEvent& event)
 
 void MyProject1MyFrame1::open_file_open_event(wxCommandEvent& event)
 {
+	if (no_images >= 5)
+	{
+		wxMessageBox("Maximum images count exceeded", "Error", wxICON_ERROR);
+		return;
+	}
+
 	wxFileDialog files(this, _("Choose images"), "", "", "*.jpg", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 	if (files.ShowModal() == wxID_CANCEL)
 	{
 		return;
 	}
 
-	if (this->bitmaps.size() >= 5)
-	{
-		wxMessageBox("Maximum images count exceeded", "Error", wxICON_ERROR);
-		return;
-	}
-
 	wxImage img(files.GetPath());
-	wxBitmap bmp = wxBitmap(img);
-	originalSizes.emplace_back(
-		std::make_tuple(img.GetWidth(), img.GetHeight()));
-	bitmaps.emplace_back(bmp);
-	bitmapsC[current]->SetBitmap(
-		wxBitmap(img.Scale(img.GetWidth() / 50, img.GetHeight() / 50)));
-	current += 1;
+	images[no_images] = img; // shallow copy
+
+	wxSize size{ img.GetSize() };
+	double ratio{ size.x / static_cast<double>(size.y) };
+	miniatures[no_images]->SetBitmap(wxBitmap(img.Scale(static_cast<int>(50 * ratio), 50))); // Scale return new wxImage
+
+	++no_images;
+	current_bitmap = wxBitmap(img);
+	Layout();
 }
 
 void MyProject1MyFrame1::save_file_save_event(wxCommandEvent& event)
 {
 	try
 	{
-		if (nowBitmap.IsOk())
+		if (current_bitmap.IsOk())
 		{
-			nowBitmap.SaveFile("image.bmp", wxBitmapType::wxBITMAP_TYPE_BMP);
+			current_bitmap.SaveFile("image.bmp", wxBitmapType::wxBITMAP_TYPE_BMP);
 		}
 		wxMessageBox("Image has been saved", "File saved", wxICON_INFORMATION);
 	}
-	catch (std::exception& ex)
+	catch (std::exception&)
 	{
 		wxMessageBox("Error while saving patched image!", "Error", wxICON_ERROR);
 	}
@@ -73,26 +75,26 @@ void MyProject1MyFrame1::clear_pts_event(wxCommandEvent& event)
 
 void MyProject1MyFrame1::about_menu_authors_open(wxCommandEvent& event)
 {
-	wxMessageBox("Ignacy,Piotr,Szymon", "Authors", wxICON_INFORMATION);
+	wxMessageBox("Ignacy, Piotr, Szymon", "Authors", wxICON_INFORMATION);
 }
 
 void MyProject1MyFrame1::patch_click(wxCommandEvent& event)
 {
-	if (this->bitmaps.empty()) {
-		wxMessageBox("Can'\t patch on the blank image", "An error has occured", wxICON_ERROR);
+	if (no_images == 0) {
+		wxMessageBox("Can't patch on the blank image", "An error has occured", wxICON_ERROR);
 		return;
 	}
 
+	// this needs rework
 	switch (mode)
 	{
 	case 0:
-		nowBitmap = this->bitmaps[0];
-		mode++;
+		mode = 1;
 		break;
 	default:
-		iteratePoints(nowBitmap, this->bitmaps[0]);
-		swap(currentBitmap);
-		this->bitmaps[0] = nowBitmap;
+		//iteratePoints(current_bitmap, this->bitmaps[0]);
+		//swap(currentBitmap);
+		//this->bitmaps[0] = current_bitmap;
 		mode = 0;
 		this->Update();
 		break;
@@ -101,55 +103,69 @@ void MyProject1MyFrame1::patch_click(wxCommandEvent& event)
 
 void MyProject1MyFrame1::org_size_click(wxCommandEvent& event)
 {
-	if (this->bitmaps.empty()) return;
+	if (no_images == 0) return;
 
-	this->bitmaps[0] = wxBitmap(this->bitmaps[0].ConvertToImage().Scale(std::get<0>(this->originalSizes[0]), std::get<1>(this->originalSizes[0])));
+	current_bitmap = wxBitmap(images[currently_edited]);
 }
 
 void MyProject1MyFrame1::width_size_click(wxCommandEvent& event)
 {
-	if (this->bitmaps.empty()) return;
+	if (no_images == 0) return;
 
-	this->bitmaps[0] = wxBitmap(this->bitmaps[0].ConvertToImage().Scale(this->img_panel->GetSize().GetWidth(), std::get<1>(this->originalSizes[0])));
+	wxSize size{ img_panel->GetSize() };
+	double ratio{ size.x / static_cast<double>(size.y) };
+	current_bitmap = wxBitmap(images[currently_edited].Scale(size.x, static_cast<int>(size.y * ratio)));
 }
 
 void MyProject1MyFrame1::height_size_click(wxCommandEvent& event)
 {
-	if (this->bitmaps.empty()) return;
+	if (no_images == 0) return;
 
-	this->bitmaps[0] = wxBitmap(this->bitmaps[0].ConvertToImage().Scale(std::get<0>(this->originalSizes[0]), this->img_panel->GetSize().GetHeight()));
+	wxSize size{ img_panel->GetSize() };
+	double ratio{ size.x / static_cast<double>(size.y) };
+	current_bitmap = wxBitmap(images[currently_edited].Scale(static_cast<int>(size.x / ratio), size.y));
 }
 
 void MyProject1MyFrame1::fit_click(wxCommandEvent& event)
 {
-	if (this->bitmaps.empty()) return;
+	if (no_images == 0) return;
 
-	this->bitmaps[0] = wxBitmap(this->bitmaps[0].ConvertToImage().Scale(this->img_panel->GetSize().GetWidth(), this->img_panel->GetSize().GetHeight()));
+	// need change, going to sleep
+	wxSize panel_size{ img_panel->GetSize() };
+	wxSize img_size{ images[currently_edited].GetSize() };
+	//double ratio{ size.x / static_cast<double>(size.y) };
+		
+	//current_bitmap = wxBitmap(images[currently_edited].Scale(static_cast<int>(size.x / ratio), size.y));
 }
 
 void MyProject1MyFrame1::m_bitmap1_click(wxMouseEvent& event)
 {
-	swap(0);
+	currently_edited = 0;
+	current_bitmap = wxBitmap(images[currently_edited]);
 }
 
 void MyProject1MyFrame1::m_bitmap2_click(wxMouseEvent& event)
 {
-	swap(1);
+	currently_edited = 1;
+	current_bitmap = wxBitmap(images[currently_edited]);
 }
 
 void MyProject1MyFrame1::m_bitmap3_click(wxMouseEvent& event)
 {
-	swap(2);
+	currently_edited = 2;
+	current_bitmap = wxBitmap(images[currently_edited]);
 }
 
 void MyProject1MyFrame1::m_bitmap4_click(wxMouseEvent& event)
 {
-	swap(3);
+	currently_edited = 3;
+	current_bitmap = wxBitmap(images[currently_edited]);
 }
 
 void MyProject1MyFrame1::m_bitmap5_click(wxMouseEvent& event)
 {
-	swap(4);
+	currently_edited = 4;
+	current_bitmap = wxBitmap(images[currently_edited]);
 }
 
 void MyProject1MyFrame1::mouse_point_click(wxMouseEvent& event)
@@ -292,6 +308,7 @@ bool MyProject1MyFrame1::isInside(std::vector<wxPoint> polygon, int n, wxPoint& 
 
 void MyProject1MyFrame1::swap(int ind)
 {
+	/*
 	currentBitmap = ind;
 	int newIndex = ind;
 
@@ -306,5 +323,5 @@ void MyProject1MyFrame1::swap(int ind)
 	bitmapsC[0]->SetBitmap(wxBitmap(this->bitmaps[0].ConvertToImage().Scale(std::get<0>(this->originalSizes[0]) / 50, std::get<1>(this->originalSizes[0]) / 50)));
 
 	bitmapsC[newIndex]->SetBitmap(wxBitmap(this->bitmaps[newIndex].ConvertToImage().Scale(std::get<0>(this->originalSizes[newIndex]) / 50, std::get<1>(this->originalSizes[newIndex]) / 50)));
-	this->Update();
+	this->Update();*/
 }

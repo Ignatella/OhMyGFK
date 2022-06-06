@@ -49,7 +49,6 @@ public:
 private:
 	void swap(int ind = 0);
 
-
 	void iteratePoints(wxBitmap& bmp, wxBitmap& other);
 
 	bool onSegment(wxPoint& p, wxPoint& q, wxPoint& r);
@@ -58,25 +57,23 @@ private:
 
 	bool isInside(std::vector<wxPoint> polygon, int n, wxPoint& p);
 
-
 	bool doIntersect(wxPoint& p1, wxPoint& q1, wxPoint& p2, wxPoint& q2);
 
-	std::vector<wxBitmap> bitmaps;
-	std::array<wxStaticBitmap*, 5> bitmapsC = { m_bitmap1, m_bitmap2, m_bitmap3, m_bitmap4, m_bitmap5 };
-	std::vector<std::tuple<double, double>> originalSizes;
+	// holds original images
+	std::array<wxImage, 5> images;
+	// number of correct elements in images
+	size_t no_images{ 0 };
+	size_t currently_edited{ 0 };
+	std::array<wxStaticBitmap*, 5> miniatures = { m_bitmap1, m_bitmap2, m_bitmap3, m_bitmap4, m_bitmap5 };
 
-	wxBitmap nowBitmap;
+	// bitmap of currently displayed image
+	wxBitmap current_bitmap;
 
-	int current = 0;
 	int mode = 0;
-	int currentBitmap = 0;
+	//int current = 0;
+	//int currentBitmap = 0;
 
 	std::vector<wxPoint> positions;
-
-
-
-
-
 
 };
 
