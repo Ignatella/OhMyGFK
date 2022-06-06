@@ -23,36 +23,44 @@ class MyProject1MyFrame1 : public MyFrame1
 {
 protected:
 	// Handlers for MyFrame1 events.
-	void on_update(wxUpdateUIEvent& event);
-	void open_file_open_event(wxCommandEvent& event);
-	void save_file_save_event(wxCommandEvent& event);
-	void about_menu_authors_open(wxCommandEvent& event);
-	void clear_pts_event(wxCommandEvent& event);
-	void patch_click(wxCommandEvent& event);
-	void m_bitmap1_click(wxMouseEvent& event);
-	void m_bitmap2_click(wxMouseEvent& event);
-	void m_bitmap3_click(wxMouseEvent& event);
-	void m_bitmap4_click(wxMouseEvent& event);
-	void m_bitmap5_click(wxMouseEvent& event);
-	void org_size_click(wxCommandEvent& event);
-	void width_size_click(wxCommandEvent& event);
-	void height_size_click(wxCommandEvent& event);
-	void fit_click(wxCommandEvent& event);
-	void mouse_point_click(wxMouseEvent& event);
+	void on_update(wxUpdateUIEvent &event);
+	void open_file_open_event(wxCommandEvent &event);
+	void save_file_save_event(wxCommandEvent &event);
+	void about_menu_authors_open(wxCommandEvent &event);
+	void clear_pts_event(wxCommandEvent &event);
+	void patch_click(wxCommandEvent &event);
+	void m_bitmap1_click(wxMouseEvent &event);
+	void m_bitmap2_click(wxMouseEvent &event);
+	void m_bitmap3_click(wxMouseEvent &event);
+	void m_bitmap4_click(wxMouseEvent &event);
+	void m_bitmap5_click(wxMouseEvent &event);
+	void org_size_click(wxCommandEvent &event);
+	void width_size_click(wxCommandEvent &event);
+	void height_size_click(wxCommandEvent &event);
+	void fit_click(wxCommandEvent &event);
+	void mouse_point_click(wxMouseEvent &event);
 
 public:
 	/** Constructor */
-	MyProject1MyFrame1(wxWindow* parent);
+	MyProject1MyFrame1(wxWindow *parent);
 	//// end generated class members
 private:
 	void swap(int ind = 0);
-	void MyProject1MyFrame1::iteratePoints(wxBitmap& bmp, wxBitmap& other);
-	bool onSegment(wxPoint& p, wxPoint& q, wxPoint& r);
-	int orientation(wxPoint& p, wxPoint& q, wxPoint& r);
-	bool isInside(std::vector<wxPoint> polygon, int n, wxPoint& p);
-	bool doIntersect(wxPoint& p1, wxPoint& q1, wxPoint& p2, wxPoint& q2);
+
+
+	void iteratePoints(wxBitmap &bmp, wxBitmap &other);
+
+	bool onSegment(wxPoint &p, wxPoint &q, wxPoint &r);
+
+	int orientation(wxPoint &p, wxPoint &q, wxPoint &r);
+
+	bool isInside(std::vector<wxPoint> polygon, int n, wxPoint &p);
+
+
+	bool doIntersect(wxPoint &p1, wxPoint &q1, wxPoint &p2, wxPoint &q2);
+
 	std::vector<wxBitmap> bitmaps;
-	std::array<wxStaticBitmap*, 5> bitmapsC = {m_bitmap1,m_bitmap2,m_bitmap3,m_bitmap4,m_bitmap5};
+	std::array<wxStaticBitmap *, 5> bitmapsC = {m_bitmap1, m_bitmap2, m_bitmap3, m_bitmap4, m_bitmap5};
 	std::vector<std::tuple<double, double>> originalSizes;
 
 	wxBitmap nowBitmap;

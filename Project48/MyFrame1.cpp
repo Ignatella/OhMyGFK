@@ -52,7 +52,7 @@ MyFrame1::MyFrame1(wxWindow* parent, wxWindowID id, const wxString& title, const
 	wxBoxSizer* bSizer2;
 	bSizer2 = new wxBoxSizer(wxHORIZONTAL);
 
-	patch_button = new wxButton(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0);
+	patch_button = new wxButton(this, wxID_ANY, "Patch", wxDefaultPosition, wxDefaultSize, 0);
 
 	patch_button->SetBitmap(wxBitmap(wxT("./assets/icon.bmp"), wxBITMAP_TYPE_ANY));
 	bSizer2->Add(patch_button, 0, wxALL, 5);
