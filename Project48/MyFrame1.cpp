@@ -34,9 +34,15 @@ MyFrame1::MyFrame1(wxWindow* parent, wxWindowID id, const wxString& title, const
 	about_menu_authors = new wxMenuItem(about_menu, wxID_ANY, wxString(wxT("Authors")), wxEmptyString, wxITEM_NORMAL);
 	about_menu_authors->SetItemLabel("Authors \tCtrl+A");
 
+
 	about_menu->Append(about_menu_authors);
 
 	m_menubar1->Append(about_menu, wxT("About"));
+
+	wxMenuItem* file_menu_clear_pts;
+	file_menu_clear_pts = new wxMenuItem(file_menu, wxID_ANY, wxString(wxT("Clear Points")), wxEmptyString, wxITEM_NORMAL);
+	file_menu_clear_pts->SetItemLabel("Clear Points \tCtrl+Z");
+	file_menu->Append(file_menu_clear_pts);
 
 	this->SetMenuBar(m_menubar1);
 
@@ -114,6 +120,7 @@ MyFrame1::MyFrame1(wxWindow* parent, wxWindowID id, const wxString& title, const
 	this->Connect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(MyFrame1::on_update));
 	file_menu->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MyFrame1::open_file_open_event), this, file_menu_open_file->GetId());
 	file_menu->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MyFrame1::save_file_save_event), this, file_menu_save_file->GetId());
+	file_menu->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MyFrame1::clear_pts_event), this, file_menu_clear_pts->GetId());
 	about_menu->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MyFrame1::about_menu_authors_open), this, about_menu_authors->GetId());
 	patch_button->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame1::patch_click), NULL, this);
 	m_bitmap1->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MyFrame1::m_bitmap1_click), NULL, this);
@@ -125,6 +132,7 @@ MyFrame1::MyFrame1(wxWindow* parent, wxWindowID id, const wxString& title, const
 	width_size_button->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame1::width_size_click), NULL, this);
 	height_button->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame1::height_size_click), NULL, this);
 	fit_button->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame1::fit_click), NULL, this);
+	img_panel->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MyFrame1::mouse_point_click), NULL, this);
 }
 
 MyFrame1::~MyFrame1()
@@ -141,5 +149,6 @@ MyFrame1::~MyFrame1()
 	width_size_button->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame1::width_size_click), NULL, this);
 	height_button->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame1::height_size_click), NULL, this);
 	fit_button->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame1::fit_click), NULL, this);
+	img_panel->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MyFrame1::mouse_point_click), NULL, this);
 
 }

@@ -54,6 +54,7 @@ protected:
 	virtual void on_update(wxUpdateUIEvent& event) { event.Skip(); }
 	virtual void open_file_open_event(wxCommandEvent& event) { event.Skip(); }
 	virtual void save_file_save_event(wxCommandEvent& event) { event.Skip(); }
+	virtual void clear_pts_event(wxCommandEvent& event) { event.Skip(); }
 	virtual void about_menu_authors_open(wxCommandEvent& event) { event.Skip(); }
 	virtual void patch_click(wxCommandEvent& event) { event.Skip(); }
 	virtual void m_bitmap1_click(wxMouseEvent& event) { event.Skip(); }
@@ -65,6 +66,7 @@ protected:
 	virtual void width_size_click(wxCommandEvent& event) { event.Skip(); }
 	virtual void height_size_click(wxCommandEvent& event) { event.Skip(); }
 	virtual void fit_click(wxCommandEvent& event) { event.Skip(); }
+	virtual void mouse_point_click(wxMouseEvent& event) { event.Skip(); }
 
 
 public:

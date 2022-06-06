@@ -14,3 +14,5 @@
 ## Usage
 
 ## Updates
+
+- Single image patch completed <06-06-2022>
