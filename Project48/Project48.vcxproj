@@ -71,8 +71,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\wxWidgets-3.0.5\include\msvc;C:\wxWidgets-3.0.5\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\wxWidgets-3.0.5\lib\vc_x64_lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\wxWidgets-3.0.5\include;D:\wxWidgets-3.0.5\include\msvc;C:\wxWidgets-3.0.5\include\msvc;C:\wxWidgets-3.0.5\include;$(IncludePath);$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>D:\wxWidgets-3.0.5\lib\vc_x64_lib;C:\wxWidgets-3.0.5\lib\vc_x64_lib;$(LibraryPath);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LibraryPath>D:\wxWidgets-3.0.5\lib\vc_x64_lib;C:\wxWidgets-3.0.5\lib\vc_x64_lib;$(LibraryPath);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+    <IncludePath>D:\wxWidgets-3.0.5\include;D:\wxWidgets-3.0.5\include\msvc;C:\wxWidgets-3.0.5\include\msvc;C:\wxWidgets-3.0.5\include;$(IncludePath);$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -107,7 +111,8 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

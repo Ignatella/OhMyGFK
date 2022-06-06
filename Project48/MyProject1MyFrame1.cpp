@@ -1,15 +1,13 @@
 #include "MyProject1MyFrame1.h"
-#include <wx/filedlg.h>
-#include <wx/msgdlg.h>
-#include <wx/dcbuffer.h>
 
-MyProject1MyFrame1::MyProject1MyFrame1(wxWindow *parent)
-	: MyFrame1(parent)
+MyProject1MyFrame1::MyProject1MyFrame1(wxWindow* parent)
+	:
+	MyFrame1(parent)
 {
 	wxImage::AddHandler(new wxJPEGHandler);
 }
 
-void MyProject1MyFrame1::on_update(wxUpdateUIEvent &event)
+void MyProject1MyFrame1::on_update(wxUpdateUIEvent& event)
 {
 	wxClientDC dc(this->img_panel);
 	wxBufferedDC mdc(&dc);
@@ -27,12 +25,63 @@ void MyProject1MyFrame1::on_update(wxUpdateUIEvent &event)
 	}
 }
 
-void MyProject1MyFrame1::patch_click(wxCommandEvent &event)
+void MyProject1MyFrame1::open_file_open_event(wxCommandEvent& event)
 {
-  if (this->bitmaps.empty()) {
-    wxMessageBox("Can'\t patch on the blank image", "An error has occured", wxICON_ERROR);
-    return;
-  }
+	wxFileDialog files(this, _("Choose images"), "", "", "*.jpg", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+	if (files.ShowModal() == wxID_CANCEL)
+	{
+		return;
+	}
+
+	if (this->bitmaps.size() >= 5)
+	{
+		wxMessageBox("Maximum images count exceeded", "Error", wxICON_ERROR);
+		return;
+	}
+
+	wxImage img(files.GetPath());
+	wxBitmap bmp = wxBitmap(img);
+	originalSizes.emplace_back(
+		std::make_tuple(img.GetWidth(), img.GetHeight()));
+	bitmaps.emplace_back(bmp);
+	bitmapsC[current]->SetBitmap(
+		wxBitmap(img.Scale(img.GetWidth() / 50, img.GetHeight() / 50)));
+	current += 1;
+}
+
+void MyProject1MyFrame1::save_file_save_event(wxCommandEvent& event)
+{
+	try
+	{
+		if (nowBitmap.IsOk())
+		{
+			nowBitmap.SaveFile("image.bmp", wxBitmapType::wxBITMAP_TYPE_BMP);
+		}
+		wxMessageBox("Image has been saved", "File saved", wxICON_INFORMATION);
+	}
+	catch (std::exception& ex)
+	{
+		wxMessageBox("Error while saving patched image!", "Error", wxICON_ERROR);
+	}
+}
+
+void MyProject1MyFrame1::clear_pts_event(wxCommandEvent& event)
+{
+	positions.clear();
+	wxMessageBox("Points cleared", "Points cleared successfully");
+}
+
+void MyProject1MyFrame1::about_menu_authors_open(wxCommandEvent& event)
+{
+	wxMessageBox("Ignacy,Piotr,Szymon", "Authors", wxICON_INFORMATION);
+}
+
+void MyProject1MyFrame1::patch_click(wxCommandEvent& event)
+{
+	if (this->bitmaps.empty()) {
+		wxMessageBox("Can'\t patch on the blank image", "An error has occured", wxICON_ERROR);
+		return;
+	}
 
 	switch (mode)
 	{
@@ -50,124 +99,60 @@ void MyProject1MyFrame1::patch_click(wxCommandEvent &event)
 	}
 }
 
-void MyProject1MyFrame1::swap(int ind)
-{
-	currentBitmap = ind;
-	int newIndex = ind;
-
-	wxBitmap first = this->bitmaps[0];
-	std::tuple<double, double> firstSize = this->originalSizes[0];
-
-	this->bitmaps[0] = this->bitmaps[newIndex];
-	this->bitmaps[newIndex] = first;
-
-	this->originalSizes[0] = this->originalSizes[newIndex];
-	this->originalSizes[newIndex] = firstSize;
-	bitmapsC[0]->SetBitmap(wxBitmap(this->bitmaps[0].ConvertToImage().Scale(std::get<0>(this->originalSizes[0]) / 50, std::get<1>(this->originalSizes[0]) / 50)));
-
-	bitmapsC[newIndex]->SetBitmap(wxBitmap(this->bitmaps[newIndex].ConvertToImage().Scale(std::get<0>(this->originalSizes[newIndex]) / 50, std::get<1>(this->originalSizes[newIndex]) / 50)));
-	this->Update();
-}
-
-void MyProject1MyFrame1::org_size_click(wxCommandEvent &event)
+void MyProject1MyFrame1::org_size_click(wxCommandEvent& event)
 {
 	if (this->bitmaps.empty()) return;
 
 	this->bitmaps[0] = wxBitmap(this->bitmaps[0].ConvertToImage().Scale(std::get<0>(this->originalSizes[0]), std::get<1>(this->originalSizes[0])));
 }
 
-void MyProject1MyFrame1::width_size_click(wxCommandEvent &event)
+void MyProject1MyFrame1::width_size_click(wxCommandEvent& event)
 {
 	if (this->bitmaps.empty()) return;
 
 	this->bitmaps[0] = wxBitmap(this->bitmaps[0].ConvertToImage().Scale(this->img_panel->GetSize().GetWidth(), std::get<1>(this->originalSizes[0])));
 }
 
-void MyProject1MyFrame1::height_size_click(wxCommandEvent &event)
+void MyProject1MyFrame1::height_size_click(wxCommandEvent& event)
 {
 	if (this->bitmaps.empty()) return;
 
 	this->bitmaps[0] = wxBitmap(this->bitmaps[0].ConvertToImage().Scale(std::get<0>(this->originalSizes[0]), this->img_panel->GetSize().GetHeight()));
 }
 
-void MyProject1MyFrame1::fit_click(wxCommandEvent &event)
+void MyProject1MyFrame1::fit_click(wxCommandEvent& event)
 {
 	if (this->bitmaps.empty()) return;
 
 	this->bitmaps[0] = wxBitmap(this->bitmaps[0].ConvertToImage().Scale(this->img_panel->GetSize().GetWidth(), this->img_panel->GetSize().GetHeight()));
 }
 
-void MyProject1MyFrame1::open_file_open_event(wxCommandEvent &event)
-{
-	wxFileDialog files(this, _("Choose images"), "", "", "*.jpg", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
-	if (files.ShowModal() == wxID_CANCEL)
-	{
-		return;
-	}
-
-	if (this->bitmaps.size() >= 5)
-	{
-		wxMessageBox("Maximum images count exceeded", "Error", wxICON_ERROR);
-          return;
-    }
-
-    wxImage img(files.GetPath());
-    wxBitmap bmp = wxBitmap(img);
-    originalSizes.emplace_back(
-        std::make_tuple(img.GetWidth(), img.GetHeight()));
-    bitmaps.emplace_back(bmp);
-    bitmapsC[current]->SetBitmap(
-        wxBitmap(img.Scale(img.GetWidth() / 50, img.GetHeight() / 50)));
-    current += 1;
-}
-
-void MyProject1MyFrame1::save_file_save_event(wxCommandEvent &event)
-{
-	try
-	{
-		if (nowBitmap.IsOk())
-		{
-			nowBitmap.SaveFile("image.bmp", wxBitmapType::wxBITMAP_TYPE_BMP);
-		}
-		wxMessageBox("Image has been saved", "File saved", wxICON_INFORMATION);
-	}
-	catch (std::exception &ex)
-	{
-		wxMessageBox("Error while saving patched image!", "Error", wxICON_ERROR);
-	}
-}
-
-void MyProject1MyFrame1::about_menu_authors_open(wxCommandEvent &event)
-{
-	wxMessageBox("Ignacy,Piotr,Szymon", "Authors", wxICON_INFORMATION);
-}
-
-void MyProject1MyFrame1::m_bitmap1_click(wxMouseEvent &event)
+void MyProject1MyFrame1::m_bitmap1_click(wxMouseEvent& event)
 {
 	swap(0);
 }
 
-void MyProject1MyFrame1::m_bitmap2_click(wxMouseEvent &event)
+void MyProject1MyFrame1::m_bitmap2_click(wxMouseEvent& event)
 {
 	swap(1);
 }
 
-void MyProject1MyFrame1::m_bitmap3_click(wxMouseEvent &event)
+void MyProject1MyFrame1::m_bitmap3_click(wxMouseEvent& event)
 {
 	swap(2);
 }
 
-void MyProject1MyFrame1::m_bitmap4_click(wxMouseEvent &event)
+void MyProject1MyFrame1::m_bitmap4_click(wxMouseEvent& event)
 {
 	swap(3);
 }
 
-void MyProject1MyFrame1::m_bitmap5_click(wxMouseEvent &event)
+void MyProject1MyFrame1::m_bitmap5_click(wxMouseEvent& event)
 {
 	swap(4);
 }
 
-void MyProject1MyFrame1::mouse_point_click(wxMouseEvent &event)
+void MyProject1MyFrame1::mouse_point_click(wxMouseEvent& event)
 {
 	if (mode == 1)
 	{
@@ -183,13 +168,8 @@ void MyProject1MyFrame1::mouse_point_click(wxMouseEvent &event)
 	}
 }
 
-void MyProject1MyFrame1::clear_pts_event(wxCommandEvent &event)
-{
-	positions.clear();
-	wxMessageBox("Points cleared", "Points cleared successfully");
-}
 
-void MyProject1MyFrame1::iteratePoints(wxBitmap &bmp, wxBitmap &other)
+void MyProject1MyFrame1::iteratePoints(wxBitmap& bmp, wxBitmap& other)
 {
 	if (!positions.empty())
 	{
@@ -214,7 +194,7 @@ void MyProject1MyFrame1::iteratePoints(wxBitmap &bmp, wxBitmap &other)
 
 // Given three collinear points p, q, r, the function checks if
 // point q lies on line segment 'pr'
-bool MyProject1MyFrame1::onSegment(wxPoint &p, wxPoint &q, wxPoint &r)
+bool MyProject1MyFrame1::onSegment(wxPoint& p, wxPoint& q, wxPoint& r)
 {
 	if (q.x <= std::max(p.x, r.x) && q.x >= std::min(p.x, r.x) &&
 		q.y <= std::max(p.y, r.y) && q.y >= std::min(p.y, r.y))
@@ -222,24 +202,9 @@ bool MyProject1MyFrame1::onSegment(wxPoint &p, wxPoint &q, wxPoint &r)
 	return false;
 }
 
-// To find orientation of ordered triplet (p, q, r).
-// The function returns following values
-// 0 --> p, q and r are collinear
-// 1 --> Clockwise
-// 2 --> Counterclockwise
-int MyProject1MyFrame1::orientation(wxPoint &p, wxPoint &q, wxPoint &r)
-{
-	int val = (q.y - p.y) * (r.x - q.x) -
-			  (q.x - p.x) * (r.y - q.y);
-
-	if (val == 0)
-		return 0;			  // collinear
-	return (val > 0) ? 1 : 2; // clock or counterclock wise
-}
-
 // The function that returns true if line segment 'p1q1'
 // and 'p2q2' intersect.
-bool MyProject1MyFrame1::doIntersect(wxPoint &p1, wxPoint &q1, wxPoint &p2, wxPoint &q2)
+bool MyProject1MyFrame1::doIntersect(wxPoint& p1, wxPoint& q1, wxPoint& p2, wxPoint& q2)
 {
 	// Find the four orientations needed for general and
 	// special cases
@@ -272,8 +237,24 @@ bool MyProject1MyFrame1::doIntersect(wxPoint &p1, wxPoint &q1, wxPoint &p2, wxPo
 	return false; // Doesn't fall in any of the above cases
 }
 
+// To find orientation of ordered triplet (p, q, r).
+// The function returns following values
+// 0 --> p, q and r are collinear
+// 1 --> Clockwise
+// 2 --> Counterclockwise
+int MyProject1MyFrame1::orientation(wxPoint& p, wxPoint& q, wxPoint& r)
+{
+	int val = (q.y - p.y) * (r.x - q.x) -
+		(q.x - p.x) * (r.y - q.y);
+
+	if (val == 0)
+		return 0;			  // collinear
+	return (val > 0) ? 1 : 2; // clock or counterclock wise
+}
+
+
 // Returns true if the point p lies inside the polygon[] with n vertices
-bool MyProject1MyFrame1::isInside(std::vector<wxPoint> polygon, int n, wxPoint &p)
+bool MyProject1MyFrame1::isInside(std::vector<wxPoint> polygon, int n, wxPoint& p)
 {
 	// There must be at least 3 vertices in polygon[]
 	if (n < 3)
@@ -305,4 +286,23 @@ bool MyProject1MyFrame1::isInside(std::vector<wxPoint> polygon, int n, wxPoint &
 
 	// Return true if count is odd, false otherwise
 	return count & 1; // Same as (count%2 == 1)
+}
+
+void MyProject1MyFrame1::swap(int ind)
+{
+	currentBitmap = ind;
+	int newIndex = ind;
+
+	wxBitmap first = this->bitmaps[0];
+	std::tuple<double, double> firstSize = this->originalSizes[0];
+
+	this->bitmaps[0] = this->bitmaps[newIndex];
+	this->bitmaps[newIndex] = first;
+
+	this->originalSizes[0] = this->originalSizes[newIndex];
+	this->originalSizes[newIndex] = firstSize;
+	bitmapsC[0]->SetBitmap(wxBitmap(this->bitmaps[0].ConvertToImage().Scale(std::get<0>(this->originalSizes[0]) / 50, std::get<1>(this->originalSizes[0]) / 50)));
+
+	bitmapsC[newIndex]->SetBitmap(wxBitmap(this->bitmaps[newIndex].ConvertToImage().Scale(std::get<0>(this->originalSizes[newIndex]) / 50, std::get<1>(this->originalSizes[newIndex]) / 50)));
+	this->Update();
 }
