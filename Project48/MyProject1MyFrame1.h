@@ -74,6 +74,10 @@ private:
 	std::vector<wxPoint> positions;
 
 
+
+
+
+
 };
 
 #endif // __MyProject1MyFrame1__

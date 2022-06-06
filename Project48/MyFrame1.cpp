@@ -11,7 +11,7 @@
 
 MyFrame1::MyFrame1(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxFrame(parent, id, title, pos, size, style)
 {
-	this->SetSizeHints(wxDefaultSize, wxDefaultSize);
+	this->SetSizeHints(wxSize(500, 350), wxDefaultSize);
 
 	m_menubar1 = new wxMenuBar(0);
 	file_menu = new wxMenu();
@@ -47,19 +47,19 @@ MyFrame1::MyFrame1(wxWindow* parent, wxWindowID id, const wxString& title, const
 	patch_button = new wxButton(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0);
 
 	patch_button->SetBitmap(wxBitmap(wxT("assets/icon.bmp"), wxBITMAP_TYPE_ANY));
-	bSizer4->Add(patch_button, 0, wxALL, 5);
+	bSizer4->Add(patch_button, 0, wxALL | wxEXPAND | wxALIGN_CENTER_HORIZONTAL, 5);
 
 	org_size_button = new wxButton(this, wxID_ANY, wxT("Original Size"), wxDefaultPosition, wxDefaultSize, 0);
-	bSizer4->Add(org_size_button, 0, wxALL, 5);
+	bSizer4->Add(org_size_button, 0, wxALL | wxEXPAND | wxALIGN_CENTER_HORIZONTAL, 5);
 
 	width_size_button = new wxButton(this, wxID_ANY, wxT("Fit Width"), wxDefaultPosition, wxDefaultSize, 0);
-	bSizer4->Add(width_size_button, 0, wxALL, 5);
+	bSizer4->Add(width_size_button, 0, wxALL | wxEXPAND | wxALIGN_CENTER_HORIZONTAL, 5);
 
 	height_button = new wxButton(this, wxID_ANY, wxT("Fit Height"), wxDefaultPosition, wxDefaultSize, 0);
-	bSizer4->Add(height_button, 0, wxALL, 5);
+	bSizer4->Add(height_button, 0, wxALL | wxEXPAND | wxALIGN_CENTER_HORIZONTAL, 5);
 
 	fit_button = new wxButton(this, wxID_ANY, wxT("Fit to Screen"), wxDefaultPosition, wxDefaultSize, 0);
-	bSizer4->Add(fit_button, 0, wxALL, 5);
+	bSizer4->Add(fit_button, 0, wxALL | wxEXPAND | wxALIGN_CENTER_HORIZONTAL, 5);
 
 
 	bSizer1->Add(bSizer4, 0, wxEXPAND, 5);
@@ -70,6 +70,7 @@ MyFrame1::MyFrame1(wxWindow* parent, wxWindowID id, const wxString& title, const
 	wxBoxSizer* bSizer2;
 	bSizer2 = new wxBoxSizer(wxHORIZONTAL);
 
+	bSizer2->SetMinSize(wxSize(-1, 60));
 	m_bitmap1 = new wxStaticBitmap(this, wxID_ANY, wxNullBitmap, wxPoint(0, 0), wxDefaultSize, 0);
 	bSizer2->Add(m_bitmap1, 0, wxALL, 5);
 
