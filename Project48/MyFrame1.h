@@ -21,7 +21,7 @@
 #include <wx/button.h>
 #include <wx/sizer.h>
 #include <wx/statbmp.h>
-#include <wx/panel.h>
+#include <wx/scrolwin.h>
 #include <wx/frame.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -48,7 +48,7 @@ protected:
 	wxStaticBitmap* m_bitmap3;
 	wxStaticBitmap* m_bitmap4;
 	wxStaticBitmap* m_bitmap5;
-	wxPanel* img_panel;
+	wxScrolledWindow* img_panel;
 
 	// Virtual event handlers, override them in your derived class
 	virtual void on_update(wxUpdateUIEvent& event) { event.Skip(); }
