@@ -12,8 +12,12 @@ void MyProject1MyFrame1::on_update(wxUpdateUIEvent& event)
 	wxClientDC dc(this->img_panel);
 	wxBufferedDC mdc(&dc);
 
+	mdc.Clear();
+
 	if (no_images > 0)
 	{
+		img_panel->DoPrepareDC(mdc);
+		img_panel->SetVirtualSize(current_bitmap.GetSize());
 		mdc.DrawBitmap(current_bitmap, wxPoint());
 
 		if (mode == 1)
@@ -185,37 +189,57 @@ void MyProject1MyFrame1::mouse_point_click(wxMouseEvent& event)
 }
 
 
-void MyProject1MyFrame1::iteratePoints(wxBitmap& bmp, wxBitmap& other)
-{
-	if (!positions.empty())
-	{
-		auto pixels = bmp.ConvertToImage();
-		auto pixelsNew = other.ConvertToImage();
 
-		for (int i = 0; i < pixels.GetWidth(); i++)
+
+
+// Returns true if the point p lies inside the polygon[] with n vertices
+bool MyProject1MyFrame1::isInside(std::vector<wxPoint> polygon, int n, wxPoint& p)
+{
+	// There must be at least 3 vertices in polygon[]
+	if (n < 3)
+		return false;
+
+	// Create a point for line segment from p to infinite
+	wxPoint extreme(5000, p.y);
+
+	// Count intersections of the above line with sides of polygon
+	int count = 0, i = 0;
+	do
+	{
+		int next = (i + 1) % n;
+
+		// Check if the line segment from 'p' to 'extreme' intersects
+		// with the line segment from 'polygon[i]' to 'polygon[next]'
+		if (doIntersect(polygon[i], polygon[next], p, extreme))
 		{
-			for (int j = 0; j < pixels.GetHeight(); j++)
-			{
-				if (isInside(positions, 5, wxPoint(i, j)))
-				{
-					pixels.SetRGB(i, j, pixelsNew.GetRed(i, j), pixelsNew.GetGreen(i, j), pixelsNew.GetBlue(i, j));
-				}
-			}
+			// If the point 'p' is collinear with line segment 'i-next',
+			// then check if it lies on segment. If it lies, return true,
+			// otherwise false
+			if (orientation(polygon[i], p, polygon[next]) == 0)
+				return onSegment(polygon[i], p, polygon[next]);
+
+			count++;
 		}
-		bmp = wxBitmap(pixels);
-	}
+		i = next;
+	} while (i != 0);
+
+	// Return true if count is odd, false otherwise
+	return count & 1; // Same as (count%2 == 1)
 }
 
-// from:https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/
-
-// Given three collinear points p, q, r, the function checks if
-// point q lies on line segment 'pr'
-bool MyProject1MyFrame1::onSegment(wxPoint& p, wxPoint& q, wxPoint& r)
+// To find orientation of ordered triplet (p, q, r).
+// The function returns following values
+// 0 --> p, q and r are collinear
+// 1 --> Clockwise
+// 2 --> Counterclockwise
+int MyProject1MyFrame1::orientation(wxPoint& p, wxPoint& q, wxPoint& r)
 {
-	if (q.x <= std::max(p.x, r.x) && q.x >= std::min(p.x, r.x) &&
-		q.y <= std::max(p.y, r.y) && q.y >= std::min(p.y, r.y))
-		return true;
-	return false;
+	int val = (q.y - p.y) * (r.x - q.x) -
+		(q.x - p.x) * (r.y - q.y);
+
+	if (val == 0)
+		return 0;			  // collinear
+	return (val > 0) ? 1 : 2; // clock or counterclock wise
 }
 
 // The function that returns true if line segment 'p1q1'
@@ -253,57 +277,37 @@ bool MyProject1MyFrame1::doIntersect(wxPoint& p1, wxPoint& q1, wxPoint& p2, wxPo
 	return false; // Doesn't fall in any of the above cases
 }
 
-// To find orientation of ordered triplet (p, q, r).
-// The function returns following values
-// 0 --> p, q and r are collinear
-// 1 --> Clockwise
-// 2 --> Counterclockwise
-int MyProject1MyFrame1::orientation(wxPoint& p, wxPoint& q, wxPoint& r)
-{
-	int val = (q.y - p.y) * (r.x - q.x) -
-		(q.x - p.x) * (r.y - q.y);
+// from:https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/
 
-	if (val == 0)
-		return 0;			  // collinear
-	return (val > 0) ? 1 : 2; // clock or counterclock wise
+// Given three collinear points p, q, r, the function checks if
+// point q lies on line segment 'pr'
+bool MyProject1MyFrame1::onSegment(wxPoint& p, wxPoint& q, wxPoint& r)
+{
+	if (q.x <= std::max(p.x, r.x) && q.x >= std::min(p.x, r.x) &&
+		q.y <= std::max(p.y, r.y) && q.y >= std::min(p.y, r.y))
+		return true;
+	return false;
 }
 
-
-
-
-// Returns true if the point p lies inside the polygon[] with n vertices
-bool MyProject1MyFrame1::isInside(std::vector<wxPoint> polygon, int n, wxPoint& p)
+void MyProject1MyFrame1::iteratePoints(wxBitmap& bmp, wxBitmap& other)
 {
-	// There must be at least 3 vertices in polygon[]
-	if (n < 3)
-		return false;
-
-	// Create a point for line segment from p to infinite
-	wxPoint extreme(5000, p.y);
-
-	// Count intersections of the above line with sides of polygon
-	int count = 0, i = 0;
-	do
+	if (!positions.empty())
 	{
-		int next = (i + 1) % n;
+		auto pixels = bmp.ConvertToImage();
+		auto pixelsNew = other.ConvertToImage();
 
-		// Check if the line segment from 'p' to 'extreme' intersects
-		// with the line segment from 'polygon[i]' to 'polygon[next]'
-		if (doIntersect(polygon[i], polygon[next], p, extreme))
+		for (int i = 0; i < pixels.GetWidth(); i++)
 		{
-			// If the point 'p' is collinear with line segment 'i-next',
-			// then check if it lies on segment. If it lies, return true,
-			// otherwise false
-			if (orientation(polygon[i], p, polygon[next]) == 0)
-				return onSegment(polygon[i], p, polygon[next]);
-
-			count++;
+			for (int j = 0; j < pixels.GetHeight(); j++)
+			{
+				if (isInside(positions, 5, wxPoint(i, j)))
+				{
+					pixels.SetRGB(i, j, pixelsNew.GetRed(i, j), pixelsNew.GetGreen(i, j), pixelsNew.GetBlue(i, j));
+				}
+			}
 		}
-		i = next;
-	} while (i != 0);
-
-	// Return true if count is odd, false otherwise
-	return count & 1; // Same as (count%2 == 1)
+		bmp = wxBitmap(pixels);
+	}
 }
 
 void MyProject1MyFrame1::swap(int ind)

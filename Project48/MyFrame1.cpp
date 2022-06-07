@@ -89,16 +89,11 @@ MyFrame1::MyFrame1(wxWindow* parent, wxWindowID id, const wxString& title, const
 
 	bSizer3->Add(bSizer2, 0, wxEXPAND, 5);
 
-	wxBoxSizer* bSizer5;
-	bSizer5 = new wxBoxSizer(wxVERTICAL);
+	img_panel = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL | wxVSCROLL);
+	img_panel->SetScrollRate(5, 5);
+	img_panel->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVEBORDER));
 
-	img_panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
-	img_panel->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BACKGROUND));
-
-	bSizer5->Add(img_panel, 1, wxALL | wxEXPAND, 5);
-
-
-	bSizer3->Add(bSizer5, 1, wxEXPAND, 5);
+	bSizer3->Add(img_panel, 1, wxEXPAND | wxALL, 5);
 
 
 	bSizer1->Add(bSizer3, 1, wxEXPAND, 5);
