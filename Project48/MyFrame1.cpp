@@ -103,8 +103,9 @@ MyFrame1::MyFrame1(wxWindow* parent, wxWindowID id, const wxString& title, const
 	this->Layout();
 
 	this->Centre(wxBOTH);
-
+	
 	// Connect Events
+	this->Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MyFrame1::move_graphics_key_down));
 	this->Connect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(MyFrame1::on_update));
 	file_menu->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MyFrame1::open_file_open_event), this, file_menu_open_file->GetId());
 	file_menu->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MyFrame1::save_file_save_event), this, file_menu_save_file->GetId());
@@ -126,6 +127,7 @@ MyFrame1::MyFrame1(wxWindow* parent, wxWindowID id, const wxString& title, const
 MyFrame1::~MyFrame1()
 {
 	// Disconnect Events
+	this->Disconnect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MyFrame1::move_graphics_key_down));
 	this->Disconnect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(MyFrame1::on_update));
 	patch_button->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame1::patch_click), NULL, this);
 	org_size_button->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame1::org_size_click), NULL, this);

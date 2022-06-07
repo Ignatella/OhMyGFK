@@ -67,7 +67,7 @@ protected:
 	virtual void m_bitmap4_click(wxMouseEvent& event) { event.Skip(); }
 	virtual void m_bitmap5_click(wxMouseEvent& event) { event.Skip(); }
 	virtual void mouse_point_click(wxMouseEvent& event) { event.Skip(); }
-
+	virtual void move_graphics_key_down(wxKeyEvent& event) { event.Skip(); }
 
 public:
 

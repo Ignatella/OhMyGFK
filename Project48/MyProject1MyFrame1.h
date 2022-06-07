@@ -42,6 +42,8 @@ protected:
 	void m_bitmap4_click(wxMouseEvent& event);
 	void m_bitmap5_click(wxMouseEvent& event);
 	void mouse_point_click(wxMouseEvent& event);
+	void move_graphics_key_down(wxKeyEvent& event);
+
 public:
 	/** Constructor */
 	MyProject1MyFrame1(wxWindow* parent);
@@ -50,6 +52,8 @@ private:
 	void swap(int ind = 0);
 
 	void iteratePoints(wxBitmap& bmp, wxBitmap& other);
+
+	void movePositions(int shift, int y = 0);
 
 	bool onSegment(wxPoint& p, wxPoint& q, wxPoint& r);
 

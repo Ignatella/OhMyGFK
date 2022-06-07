@@ -142,6 +142,33 @@ void MyProject1MyFrame1::fit_click(wxCommandEvent& event)
 	//current_bitmap = wxBitmap(images[currently_edited].Scale(static_cast<int>(size.x / ratio), size.y));
 }
 
+void MyProject1MyFrame1::movePositions(int shift, int y) {
+	for (wxPoint& pt : positions) {
+		pt.y += (y == 0) ? shift : 0;
+		pt.x += (y == 1) ? shift : 0;
+	}
+}
+
+void MyProject1MyFrame1::move_graphics_key_down(wxKeyEvent& event) {
+	switch (event.GetKeyCode()) {
+	case wxKeyCode::WXK_UP:
+		movePositions(-1, 0);
+		break;
+	case wxKeyCode::WXK_DOWN:
+		movePositions(1, 0);
+		break;
+	case wxKeyCode::WXK_LEFT:
+		movePositions(-1, 1);
+		break;
+	case wxKeyCode::WXK_RIGHT:
+		movePositions(1, 1);
+		break;
+	default:
+		break;
+	}
+	event.Skip();
+}
+
 void MyProject1MyFrame1::m_bitmap1_click(wxMouseEvent& event)
 {
 	currently_edited = 0;
