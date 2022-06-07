@@ -47,19 +47,19 @@ MyFrame1::MyFrame1(wxWindow* parent, wxWindowID id, const wxString& title, const
 	patch_button = new wxButton(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0);
 
 	patch_button->SetBitmap(wxBitmap(wxT("assets/icon.bmp"), wxBITMAP_TYPE_ANY));
-	bSizer4->Add(patch_button, 0, wxALL | wxEXPAND | wxALIGN_CENTER_HORIZONTAL, 5);
+	bSizer4->Add(patch_button, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 5);
 
 	org_size_button = new wxButton(this, wxID_ANY, wxT("Original Size"), wxDefaultPosition, wxDefaultSize, 0);
-	bSizer4->Add(org_size_button, 0, wxALL | wxEXPAND | wxALIGN_CENTER_HORIZONTAL, 5);
+	bSizer4->Add(org_size_button, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 5);
 
 	width_size_button = new wxButton(this, wxID_ANY, wxT("Fit Width"), wxDefaultPosition, wxDefaultSize, 0);
-	bSizer4->Add(width_size_button, 0, wxALL | wxEXPAND | wxALIGN_CENTER_HORIZONTAL, 5);
+	bSizer4->Add(width_size_button, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 5);
 
 	height_button = new wxButton(this, wxID_ANY, wxT("Fit Height"), wxDefaultPosition, wxDefaultSize, 0);
-	bSizer4->Add(height_button, 0, wxALL | wxEXPAND | wxALIGN_CENTER_HORIZONTAL, 5);
+	bSizer4->Add(height_button, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 5);
 
 	fit_button = new wxButton(this, wxID_ANY, wxT("Fit to Screen"), wxDefaultPosition, wxDefaultSize, 0);
-	bSizer4->Add(fit_button, 0, wxALL | wxEXPAND | wxALIGN_CENTER_HORIZONTAL, 5);
+	bSizer4->Add(fit_button, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 5);
 
 
 	bSizer1->Add(bSizer4, 0, wxEXPAND, 5);
@@ -89,10 +89,16 @@ MyFrame1::MyFrame1(wxWindow* parent, wxWindowID id, const wxString& title, const
 
 	bSizer3->Add(bSizer2, 0, wxEXPAND, 5);
 
+	wxBoxSizer* bSizer5;
+	bSizer5 = new wxBoxSizer(wxVERTICAL);
+
 	img_panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
 	img_panel->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BACKGROUND));
 
-	bSizer3->Add(img_panel, 1, wxEXPAND | wxALL, 5);
+	bSizer5->Add(img_panel, 1, wxALL | wxEXPAND, 5);
+
+
+	bSizer3->Add(bSizer5, 1, wxEXPAND, 5);
 
 
 	bSizer1->Add(bSizer3, 1, wxEXPAND, 5);

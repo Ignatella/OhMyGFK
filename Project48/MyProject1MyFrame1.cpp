@@ -134,7 +134,7 @@ void MyProject1MyFrame1::fit_click(wxCommandEvent& event)
 	wxSize panel_size{ img_panel->GetSize() };
 	wxSize img_size{ images[currently_edited].GetSize() };
 	//double ratio{ size.x / static_cast<double>(size.y) };
-		
+
 	//current_bitmap = wxBitmap(images[currently_edited].Scale(static_cast<int>(size.x / ratio), size.y));
 }
 
