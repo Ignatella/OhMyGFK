@@ -7,19 +7,6 @@ MyProject1MyFrame1::MyProject1MyFrame1(wxWindow* parent)
 	wxImage::AddHandler(new wxJPEGHandler);
 }
 
-void MyProject1MyFrame1::apply_click(wxCommandEvent& event) {
-	if (!allPositions.empty()) {
-		//works but not what we want!
-		for (int i = 0; i < allPositions.size(); i++) {
-			iteratePoints(bg_bitmap, srcBitmaps[i],allPositions[i]);
-		}
-		current_bitmap = bg_bitmap;
-		mode = 0;
-		this->Update();
-	}
-}
-
-
 void MyProject1MyFrame1::move_graphics_key_down(wxKeyEvent& event)
 {
 	switch (event.GetKeyCode()) {
@@ -142,6 +129,19 @@ void MyProject1MyFrame1::patch_click(wxCommandEvent& event)
 		positions.clear();
 		mode = 1;
 		break;
+	}
+}
+
+void MyProject1MyFrame1::apply_click(wxCommandEvent& event)
+{
+	if (!allPositions.empty()) {
+		//works but not what we want!
+		for (int i = 0; i < allPositions.size(); i++) {
+			iteratePoints(bg_bitmap, srcBitmaps[i], allPositions[i]);
+		}
+		current_bitmap = bg_bitmap;
+		mode = 0;
+		this->Update();
 	}
 }
 
@@ -330,6 +330,7 @@ bool MyProject1MyFrame1::doIntersect(wxPoint& p1, wxPoint& q1, wxPoint& p2, wxPo
 	return false; // Doesn't fall in any of the above cases
 }
 
+
 // from:https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/
 
 // Given three collinear points p, q, r, the function checks if
@@ -340,27 +341,6 @@ bool MyProject1MyFrame1::onSegment(wxPoint& p, wxPoint& q, wxPoint& r)
 		q.y <= std::max(p.y, r.y) && q.y >= std::min(p.y, r.y))
 		return true;
 	return false;
-}
-
-void MyProject1MyFrame1::iteratePoints(wxBitmap& bmp, wxBitmap& other,std::vector<wxPoint>& pos)
-{
-	if (!pos.empty())
-	{
-		auto pixels = bmp.ConvertToImage();
-		auto pixelsNew = other.ConvertToImage();
-
-		for (int i = 0; i < pixels.GetWidth(); i++)
-		{
-			for (int j = 0; j < pixels.GetHeight(); j++)
-			{
-				if (isInside(pos, 5, wxPoint(i, j)))
-				{
-					pixels.SetRGB(i, j, pixelsNew.GetRed(i, j), pixelsNew.GetGreen(i, j), pixelsNew.GetBlue(i, j));
-				}
-			}
-		}
-		bmp = wxBitmap(pixels);
-	}
 }
 
 void MyProject1MyFrame1::swap(int ind)
@@ -381,4 +361,25 @@ void MyProject1MyFrame1::swap(int ind)
 
 	bitmapsC[newIndex]->SetBitmap(wxBitmap(this->bitmaps[newIndex].ConvertToImage().Scale(std::get<0>(this->originalSizes[newIndex]) / 50, std::get<1>(this->originalSizes[newIndex]) / 50)));
 	this->Update();*/
+}
+
+void MyProject1MyFrame1::iteratePoints(wxBitmap& bmp, wxBitmap& other, std::vector<wxPoint>& pos)
+{
+	if (!pos.empty())
+	{
+		auto pixels = bmp.ConvertToImage();
+		auto pixelsNew = other.ConvertToImage();
+
+		for (int i = 0; i < pixels.GetWidth(); i++)
+		{
+			for (int j = 0; j < pixels.GetHeight(); j++)
+			{
+				if (isInside(pos, 5, wxPoint(i, j)))
+				{
+					pixels.SetRGB(i, j, pixelsNew.GetRed(i, j), pixelsNew.GetGreen(i, j), pixelsNew.GetBlue(i, j));
+				}
+			}
+		}
+		bmp = wxBitmap(pixels);
+	}
 }
