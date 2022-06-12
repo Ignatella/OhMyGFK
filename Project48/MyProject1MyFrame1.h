@@ -52,7 +52,7 @@ class MyProject1MyFrame1 : public MyFrame1
 private:
 	void swap(int ind = 0);
 
-	void iteratePoints(wxBitmap& bmp, wxBitmap& other, std::vector<wxPoint>& pos);
+	void iteratePoints(wxBitmap& bmp, wxBitmap& other, std::vector<wxPoint>& pos, std::tuple<double, double>& rt);
 
 	void movePositions(int shift, int y = 0);
 
@@ -63,6 +63,7 @@ private:
 	bool isInside(std::vector<wxPoint> polygon, int n, wxPoint& p);
 
 	bool doIntersect(wxPoint& p1, wxPoint& q1, wxPoint& p2, wxPoint& q2);
+
 
 	// holds original images
 	std::array<wxImage, 5> images;
@@ -81,8 +82,8 @@ private:
 	//int currentBitmap = 0;
 
 	std::vector<wxPoint> positions;
-
 	// vector that holds all points that make polygons
+	std::array<std::tuple<double, double>,5> ratios;
 	std::vector<std::vector<wxPoint>> allPositions;
 	std::vector<wxBitmap> srcBitmaps;
 

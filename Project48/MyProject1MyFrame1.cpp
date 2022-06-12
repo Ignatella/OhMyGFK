@@ -10,7 +10,7 @@ MyProject1MyFrame1::MyProject1MyFrame1(wxWindow* parent)
 void MyProject1MyFrame1::apply_click(wxCommandEvent& event) {
 	if (!allPositions.empty()) {
 		for (int i = 0; i < allPositions.size(); i++) {
-			iteratePoints(bg_bitmap, srcBitmaps[i],allPositions[i]);
+			iteratePoints(bg_bitmap, srcBitmaps[i], allPositions[i],ratios[i]);
 		}
 		current_bitmap = bg_bitmap;
 
@@ -173,7 +173,7 @@ void MyProject1MyFrame1::height_size_click(wxCommandEvent& event)
 
 	wxSize panel_size{ img_panel->GetSize() };
 	wxSize img_size{ images[currently_edited].GetSize() };
-	double ratio{ img_size.x / static_cast<double>(img_size.y) };
+	double ratio = img_size.x / static_cast<double>(img_size.y);
 	current_bitmap = wxBitmap(images[currently_edited].Scale(static_cast<int>(panel_size.y * ratio), panel_size.y));
 }
 
@@ -232,7 +232,11 @@ void MyProject1MyFrame1::mouse_point_click(wxMouseEvent& event)
 		}
 		else
 		{
-			positions.insert(std::begin(positions) + positions.size() - 2, wxPoint(event.GetX(), event.GetY()));
+			wxSize org_size{ images[currently_edited].GetSize() };
+			wxSize current_size{ current_bitmap.GetSize() };
+			ratios[currently_edited] = std::make_tuple<double, double>(org_size.GetWidth()/current_size.GetWidth(),org_size.GetHeight()/current_size.GetHeight());
+			positions.insert(std::begin(positions) + positions.size() - 2, wxPoint(
+				event.GetX(), event.GetY()));
 		}
 	}
 }
@@ -245,9 +249,6 @@ void MyProject1MyFrame1::movePositions(int shift, int y)
 		pt.x += (y == 1) ? shift : 0;
 	}
 }
-
-
-
 
 
 // Returns true if the point p lies inside the polygon[] with n vertices
@@ -347,7 +348,7 @@ bool MyProject1MyFrame1::onSegment(wxPoint& p, wxPoint& q, wxPoint& r)
 	return false;
 }
 
-void MyProject1MyFrame1::iteratePoints(wxBitmap& bmp, wxBitmap& other,std::vector<wxPoint>& pos)
+void MyProject1MyFrame1::iteratePoints(wxBitmap& bmp, wxBitmap& other, std::vector<wxPoint>& pos, std::tuple<double, double>& rt)
 {
 	if (!pos.empty())
 	{
@@ -358,9 +359,10 @@ void MyProject1MyFrame1::iteratePoints(wxBitmap& bmp, wxBitmap& other,std::vecto
 		{
 			for (int j = 0; j < pixels.GetHeight(); j++)
 			{
-				if (isInside(pos, 5, wxPoint(i, j)))
+				if (isInside(pos, pos.size(), wxPoint(i, j)))
 				{
-					pixels.SetRGB(i, j, pixelsNew.GetRed(i, j), pixelsNew.GetGreen(i, j), pixelsNew.GetBlue(i, j));
+					//std::get<0>(rt) * i, std::get<1>(rt) * j
+					pixels.SetRGB(i, j, pixelsNew.GetRed(i,j), pixelsNew.GetGreen(i, j), pixelsNew.GetBlue(i,j));
 				}
 			}
 		}
