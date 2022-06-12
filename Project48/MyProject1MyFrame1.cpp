@@ -9,11 +9,13 @@ MyProject1MyFrame1::MyProject1MyFrame1(wxWindow* parent)
 
 void MyProject1MyFrame1::apply_click(wxCommandEvent& event) {
 	if (!allPositions.empty()) {
-		//works but not what we want!
 		for (int i = 0; i < allPositions.size(); i++) {
 			iteratePoints(bg_bitmap, srcBitmaps[i],allPositions[i]);
 		}
 		current_bitmap = bg_bitmap;
+
+		images[0] = current_bitmap.ConvertToImage();
+		currently_edited = 0;
 		mode = 0;
 		this->Update();
 	}
@@ -87,6 +89,10 @@ void MyProject1MyFrame1::open_file_open_event(wxCommandEvent& event)
 	currently_edited = no_images;
 	current_bitmap = wxBitmap(img);
 	++no_images;
+
+	if (no_images == 1) {
+		bg_bitmap = current_bitmap;
+	}
 	Layout();
 }
 
@@ -128,7 +134,6 @@ void MyProject1MyFrame1::patch_click(wxCommandEvent& event)
 	switch (mode)
 	{
 	case 0:
-		bg_bitmap = current_bitmap;
 		mode = 1;
 		break;
 		//works but not what we want!
