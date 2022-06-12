@@ -33,6 +33,7 @@ class MyProject1MyFrame1 : public MyFrame1
 		void clear_pts_event( wxCommandEvent& event );
 		void about_menu_authors_open( wxCommandEvent& event );
 		void patch_click( wxCommandEvent& event );
+		void apply_click( wxCommandEvent& event );
 		void org_size_click( wxCommandEvent& event );
 		void width_size_click( wxCommandEvent& event );
 		void height_size_click( wxCommandEvent& event );
@@ -43,6 +44,7 @@ class MyProject1MyFrame1 : public MyFrame1
 		void m_bitmap4_click( wxMouseEvent& event );
 		void m_bitmap5_click( wxMouseEvent& event );
 		void mouse_point_click( wxMouseEvent& event );
+
 	public:
 		/** Constructor */
 		MyProject1MyFrame1( wxWindow* parent );
@@ -50,7 +52,7 @@ class MyProject1MyFrame1 : public MyFrame1
 private:
 	void swap(int ind = 0);
 
-	void iteratePoints(wxBitmap& bmp, wxBitmap& other);
+	void iteratePoints(wxBitmap& bmp, wxBitmap& other, std::vector<wxPoint>& pos);
 
 	void movePositions(int shift, int y = 0);
 
@@ -71,6 +73,8 @@ private:
 
 	// bitmap of currently displayed image
 	wxBitmap current_bitmap;
+	// bitmap that acts like the background for patch process
+	wxBitmap bg_bitmap;
 
 	int mode = 0;
 	//int current = 0;
@@ -78,9 +82,9 @@ private:
 
 	std::vector<wxPoint> positions;
 
-
-
-
+	// vector that holds all points that make polygons
+	std::vector<std::vector<wxPoint>> allPositions;
+	std::vector<wxBitmap> srcBitmaps;
 
 };
 

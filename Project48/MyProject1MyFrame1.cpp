@@ -7,6 +7,19 @@ MyProject1MyFrame1::MyProject1MyFrame1(wxWindow* parent)
 	wxImage::AddHandler(new wxJPEGHandler);
 }
 
+void MyProject1MyFrame1::apply_click(wxCommandEvent& event) {
+	if (!allPositions.empty()) {
+		//works but not what we want!
+		for (int i = 0; i < allPositions.size(); i++) {
+			iteratePoints(bg_bitmap, srcBitmaps[i],allPositions[i]);
+		}
+		current_bitmap = bg_bitmap;
+		mode = 0;
+		this->Update();
+	}
+}
+
+
 void MyProject1MyFrame1::move_graphics_key_down(wxKeyEvent& event)
 {
 	switch (event.GetKeyCode()) {
@@ -115,14 +128,19 @@ void MyProject1MyFrame1::patch_click(wxCommandEvent& event)
 	switch (mode)
 	{
 	case 0:
+		bg_bitmap = current_bitmap;
 		mode = 1;
 		break;
-	default:
-		//iteratePoints(current_bitmap, this->bitmaps[0]);
-		//swap(currentBitmap);
-		//this->bitmaps[0] = current_bitmap;
+		//works but not what we want!
+		/*iteratePoints(bg_bitmap, current_bitmap);
+		current_bitmap = bg_bitmap;
 		mode = 0;
-		this->Update();
+		this->Update();*/
+	default:
+		allPositions.emplace_back(positions);
+		srcBitmaps.emplace_back(current_bitmap);
+		positions.clear();
+		mode = 1;
 		break;
 	}
 }
@@ -215,87 +233,12 @@ void MyProject1MyFrame1::mouse_point_click(wxMouseEvent& event)
 }
 
 
-void MyProject1MyFrame1::iteratePoints(wxBitmap& bmp, wxBitmap& other)
+void MyProject1MyFrame1::movePositions(int shift, int y)
 {
-	if (!positions.empty())
-	{
-		auto pixels = bmp.ConvertToImage();
-		auto pixelsNew = other.ConvertToImage();
-
-		for (int i = 0; i < pixels.GetWidth(); i++)
-		{
-			for (int j = 0; j < pixels.GetHeight(); j++)
-			{
-				if (isInside(positions, 5, wxPoint(i, j)))
-				{
-					pixels.SetRGB(i, j, pixelsNew.GetRed(i, j), pixelsNew.GetGreen(i, j), pixelsNew.GetBlue(i, j));
-				}
-			}
-		}
-		bmp = wxBitmap(pixels);
+	for (wxPoint& pt : positions) {
+		pt.y += (y == 0) ? shift : 0;
+		pt.x += (y == 1) ? shift : 0;
 	}
-}
-
-// from:https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/
-
-// Given three collinear points p, q, r, the function checks if
-// point q lies on line segment 'pr'
-bool MyProject1MyFrame1::onSegment(wxPoint& p, wxPoint& q, wxPoint& r)
-{
-	if (q.x <= std::max(p.x, r.x) && q.x >= std::min(p.x, r.x) &&
-		q.y <= std::max(p.y, r.y) && q.y >= std::min(p.y, r.y))
-		return true;
-	return false;
-}
-
-// The function that returns true if line segment 'p1q1'
-// and 'p2q2' intersect.
-bool MyProject1MyFrame1::doIntersect(wxPoint& p1, wxPoint& q1, wxPoint& p2, wxPoint& q2)
-{
-	// Find the four orientations needed for general and
-	// special cases
-	int o1 = orientation(p1, q1, p2);
-	int o2 = orientation(p1, q1, q2);
-	int o3 = orientation(p2, q2, p1);
-	int o4 = orientation(p2, q2, q1);
-
-	// General case
-	if (o1 != o2 && o3 != o4)
-		return true;
-
-	// Special Cases
-	// p1, q1 and p2 are collinear and p2 lies on segment p1q1
-	if (o1 == 0 && onSegment(p1, p2, q1))
-		return true;
-
-	// p1, q1 and p2 are collinear and q2 lies on segment p1q1
-	if (o2 == 0 && onSegment(p1, q2, q1))
-		return true;
-
-	// p2, q2 and p1 are collinear and p1 lies on segment p2q2
-	if (o3 == 0 && onSegment(p2, p1, q2))
-		return true;
-
-	// p2, q2 and q1 are collinear and q1 lies on segment p2q2
-	if (o4 == 0 && onSegment(p2, q1, q2))
-		return true;
-
-	return false; // Doesn't fall in any of the above cases
-}
-
-// To find orientation of ordered triplet (p, q, r).
-// The function returns following values
-// 0 --> p, q and r are collinear
-// 1 --> Clockwise
-// 2 --> Counterclockwise
-int MyProject1MyFrame1::orientation(wxPoint& p, wxPoint& q, wxPoint& r)
-{
-	int val = (q.y - p.y) * (r.x - q.x) -
-		(q.x - p.x) * (r.y - q.y);
-
-	if (val == 0)
-		return 0;			  // collinear
-	return (val > 0) ? 1 : 2; // clock or counterclock wise
 }
 
 
@@ -337,11 +280,86 @@ bool MyProject1MyFrame1::isInside(std::vector<wxPoint> polygon, int n, wxPoint& 
 	return count & 1; // Same as (count%2 == 1)
 }
 
-void MyProject1MyFrame1::movePositions(int shift, int y)
+// To find orientation of ordered triplet (p, q, r).
+// The function returns following values
+// 0 --> p, q and r are collinear
+// 1 --> Clockwise
+// 2 --> Counterclockwise
+int MyProject1MyFrame1::orientation(wxPoint& p, wxPoint& q, wxPoint& r)
 {
-	for (wxPoint& pt : positions) {
-		pt.y += (y == 0) ? shift : 0;
-		pt.x += (y == 1) ? shift : 0;
+	int val = (q.y - p.y) * (r.x - q.x) -
+		(q.x - p.x) * (r.y - q.y);
+
+	if (val == 0)
+		return 0;			  // collinear
+	return (val > 0) ? 1 : 2; // clock or counterclock wise
+}
+
+// The function that returns true if line segment 'p1q1'
+// and 'p2q2' intersect.
+bool MyProject1MyFrame1::doIntersect(wxPoint& p1, wxPoint& q1, wxPoint& p2, wxPoint& q2)
+{
+	// Find the four orientations needed for general and
+	// special cases
+	int o1 = orientation(p1, q1, p2);
+	int o2 = orientation(p1, q1, q2);
+	int o3 = orientation(p2, q2, p1);
+	int o4 = orientation(p2, q2, q1);
+
+	// General case
+	if (o1 != o2 && o3 != o4)
+		return true;
+
+	// Special Cases
+	// p1, q1 and p2 are collinear and p2 lies on segment p1q1
+	if (o1 == 0 && onSegment(p1, p2, q1))
+		return true;
+
+	// p1, q1 and p2 are collinear and q2 lies on segment p1q1
+	if (o2 == 0 && onSegment(p1, q2, q1))
+		return true;
+
+	// p2, q2 and p1 are collinear and p1 lies on segment p2q2
+	if (o3 == 0 && onSegment(p2, p1, q2))
+		return true;
+
+	// p2, q2 and q1 are collinear and q1 lies on segment p2q2
+	if (o4 == 0 && onSegment(p2, q1, q2))
+		return true;
+
+	return false; // Doesn't fall in any of the above cases
+}
+
+// from:https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/
+
+// Given three collinear points p, q, r, the function checks if
+// point q lies on line segment 'pr'
+bool MyProject1MyFrame1::onSegment(wxPoint& p, wxPoint& q, wxPoint& r)
+{
+	if (q.x <= std::max(p.x, r.x) && q.x >= std::min(p.x, r.x) &&
+		q.y <= std::max(p.y, r.y) && q.y >= std::min(p.y, r.y))
+		return true;
+	return false;
+}
+
+void MyProject1MyFrame1::iteratePoints(wxBitmap& bmp, wxBitmap& other,std::vector<wxPoint>& pos)
+{
+	if (!pos.empty())
+	{
+		auto pixels = bmp.ConvertToImage();
+		auto pixelsNew = other.ConvertToImage();
+
+		for (int i = 0; i < pixels.GetWidth(); i++)
+		{
+			for (int j = 0; j < pixels.GetHeight(); j++)
+			{
+				if (isInside(pos, 5, wxPoint(i, j)))
+				{
+					pixels.SetRGB(i, j, pixelsNew.GetRed(i, j), pixelsNew.GetGreen(i, j), pixelsNew.GetBlue(i, j));
+				}
+			}
+		}
+		bmp = wxBitmap(pixels);
 	}
 }
 
