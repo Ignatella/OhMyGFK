@@ -44,30 +44,33 @@ protected:
 	void m_bitmap4_click(wxMouseEvent& event);
 	void m_bitmap5_click(wxMouseEvent& event);
 	void mouse_point_click(wxMouseEvent& event);
+
 public:
 	/** Constructor */
 	MyProject1MyFrame1(wxWindow* parent);
 	//// end generated class members
 private:
-	void swap(int ind = 0);
+	struct Vertex;
 
-	void iteratePoints(wxBitmap& bmp, wxBitmap& other, std::vector<wxPoint>& pos);
+	void switch_images(size_t new_image);
 
-	void movePositions(int shift, int y = 0);
+	void iteratePoints(std::vector<Vertex>& pos, size_t img);
 
-	bool onSegment(wxPoint& p, wxPoint& q, wxPoint& r);
+	void movePositions(int shift, bool direction = false);
 
-	int orientation(wxPoint& p, wxPoint& q, wxPoint& r);
+	bool onSegment(Vertex& p, Vertex& q, Vertex& r);
 
-	bool isInside(std::vector<wxPoint> polygon, int n, wxPoint& p);
+	int orientation(Vertex& p, Vertex& q, Vertex& r);
 
-	bool doIntersect(wxPoint& p1, wxPoint& q1, wxPoint& p2, wxPoint& q2);
+	bool isInside(std::vector<Vertex> polygon, int n, Vertex& p);
 
-	// holds original images
-	std::array<wxImage, 5> images;
-	// number of correct elements in images
-	size_t no_images{ 0 };
-	size_t currently_edited{ 0 };
+	bool doIntersect(Vertex& p1, Vertex& q1, Vertex& p2, Vertex& q2);
+
+	// holds original images (first is patched img)
+	std::array<wxImage, 6> images;
+	// number of correct elements in images array (first is patched img)
+	size_t no_images{ 1 };
+	size_t currently_edited{};
 	std::array<wxStaticBitmap*, 5> miniatures = { m_bitmap1, m_bitmap2, m_bitmap3, m_bitmap4, m_bitmap5 };
 
 	// bitmap of currently displayed image
@@ -75,18 +78,19 @@ private:
 	// bitmap that acts like the background for patch process
 	wxBitmap bg_bitmap;
 
-	int mode = 0;
-	//int current = 0;
-	//int currentBitmap = 0;
+	bool patch_mode{ false };
 
-	std::vector<wxPoint> positions;
+	// helper struct representing nodes/vertices of polygon
+	struct Vertex {
+		Vertex(double _x, double _y) : x{ _x }, y{ _y } {}
+		Vertex(int _x, int _y, double ratio) : x{ _x * ratio }, y{ _y * ratio } {}
+		double x, y;
+	};
 
-	// vector that holds all points that make polygons
-	std::vector<std::vector<wxPoint>> allPositions;
-	std::vector<wxBitmap> srcBitmaps;
-
-
-
+	// vector of points that make polygon
+	std::vector<Vertex> polygon;
+	// vector of all polygons (polygon, src image number)
+	std::vector<std::pair<std::vector<Vertex>, size_t>> all_polygons;
 };
 
 #endif // __MyProject1MyFrame1__

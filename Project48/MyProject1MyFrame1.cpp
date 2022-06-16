@@ -1,10 +1,29 @@
 #include "MyProject1MyFrame1.h"
+#include <algorithm>
 
 MyProject1MyFrame1::MyProject1MyFrame1(wxWindow* parent)
 	:
 	MyFrame1(parent)
 {
 	wxImage::AddHandler(new wxJPEGHandler);
+}
+
+void MyProject1MyFrame1::switch_images(size_t new_image) {
+	currently_edited = new_image;
+	org_size_click(wxCommandEvent());
+}
+
+void MyProject1MyFrame1::apply_click(wxCommandEvent& event)
+{
+	if (all_polygons.empty()) return;
+
+	images[0] = images[currently_edited].Copy();
+	//works but not what we want!
+	for (auto& poly : all_polygons) {
+		iteratePoints(poly.first, poly.second);
+	}
+	switch_images(0);
+	this->Update();
 }
 
 void MyProject1MyFrame1::move_graphics_key_down(wxKeyEvent& event)
@@ -30,37 +49,45 @@ void MyProject1MyFrame1::move_graphics_key_down(wxKeyEvent& event)
 
 void MyProject1MyFrame1::on_update(wxUpdateUIEvent& event)
 {
+	if (no_images == 1) return;
+
 	wxClientDC dc(this->img_panel);
 	wxBufferedDC mdc(&dc);
-
 	mdc.Clear();
 
-	if (no_images > 0)
-	{
-		img_panel->DoPrepareDC(mdc);
-		img_panel->SetVirtualSize(current_bitmap.GetSize());
-		mdc.DrawBitmap(current_bitmap, wxPoint());
+	img_panel->DoPrepareDC(mdc);
+	img_panel->SetVirtualSize(current_bitmap.GetSize());
+	mdc.DrawBitmap(current_bitmap, wxPoint());
 
-		if (mode == 1)
-		{
-			mdc.SetBrush(*wxTRANSPARENT_BRUSH);
-			mdc.SetPen(*wxGREEN_PEN);
-			mdc.DrawPolygon(positions.size(), positions.data(), 0, 0);
-		}
+	if (patch_mode == 1) {
+		mdc.SetBrush(*wxTRANSPARENT_BRUSH);
+		mdc.SetPen(*wxGREEN_PEN);
+
+		double ratio{ static_cast<double>(images[currently_edited].GetWidth()) / current_bitmap.GetWidth() };
+
+		// vector of scaled polygon points, static to save on allocation
+		static std::vector<wxPoint> tmp;
+		tmp.reserve(polygon.size());
+		std::transform(polygon.begin(), polygon.end(), std::back_inserter(tmp), [ratio](const Vertex& pt) {
+			return wxPoint{
+				static_cast<int>(pt.x / ratio),
+				static_cast<int>(pt.y / ratio) };
+			});
+
+		mdc.DrawPolygon(tmp.size(), tmp.data());
+		tmp.clear();
 	}
 }
 
 void MyProject1MyFrame1::open_file_open_event(wxCommandEvent& event)
 {
-	if (no_images >= 5)
-	{
+	if (no_images > 6) {
 		wxMessageBox("Maximum images count exceeded", "Error", wxICON_ERROR);
 		return;
 	}
 
 	wxFileDialog files(this, _("Choose images"), "", "", "*.jpg", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
-	if (files.ShowModal() == wxID_CANCEL)
-	{
+	if (files.ShowModal() == wxID_CANCEL) {
 		return;
 	}
 
@@ -69,11 +96,11 @@ void MyProject1MyFrame1::open_file_open_event(wxCommandEvent& event)
 
 	wxSize size{ img.GetSize() };
 	double ratio{ size.x / static_cast<double>(size.y) };
-	miniatures[no_images]->SetBitmap(wxBitmap(img.Scale(static_cast<int>(50 * ratio), 50))); // Scale return new wxImage
+	miniatures[no_images - 1]->SetBitmap(wxBitmap(img.Scale(static_cast<int>(50 * ratio), 50))); // Scale return new wxImage
 
-	currently_edited = no_images;
-	current_bitmap = wxBitmap(img);
 	++no_images;
+	switch_images(no_images - 1);
+
 	Layout();
 }
 
@@ -95,7 +122,7 @@ void MyProject1MyFrame1::save_file_save_event(wxCommandEvent& event)
 
 void MyProject1MyFrame1::clear_pts_event(wxCommandEvent& event)
 {
-	positions.clear();
+	polygon.clear();
 	wxMessageBox("Points cleared", "Points cleared successfully");
 }
 
@@ -106,55 +133,33 @@ void MyProject1MyFrame1::about_menu_authors_open(wxCommandEvent& event)
 
 void MyProject1MyFrame1::patch_click(wxCommandEvent& event)
 {
-	if (no_images == 0) {
+	if (no_images == 1) {
 		wxMessageBox("Can't patch on the blank image", "An error has occured", wxICON_ERROR);
 		return;
 	}
 
-	// this needs rework
-	switch (mode)
-	{
-	case 0:
-		bg_bitmap = current_bitmap;
-		mode = 1;
-		break;
-		//works but not what we want!
-		/*iteratePoints(bg_bitmap, current_bitmap);
-		current_bitmap = bg_bitmap;
-		mode = 0;
-		this->Update();*/
-	default:
-		allPositions.emplace_back(positions);
-		srcBitmaps.emplace_back(current_bitmap);
-		positions.clear();
-		mode = 1;
-		break;
+	if (patch_mode) {
+		all_polygons.emplace_back(polygon, currently_edited);
+		polygon.clear();
+		apply_button->Disable();
+		patch_mode = false;
 	}
-}
-
-void MyProject1MyFrame1::apply_click(wxCommandEvent& event)
-{
-	if (!allPositions.empty()) {
-		//works but not what we want!
-		for (int i = 0; i < allPositions.size(); i++) {
-			iteratePoints(bg_bitmap, srcBitmaps[i], allPositions[i]);
-		}
-		current_bitmap = bg_bitmap;
-		mode = 0;
-		this->Update();
+	else {
+		apply_button->Enable();
+		patch_mode = true;
 	}
 }
 
 void MyProject1MyFrame1::org_size_click(wxCommandEvent& event)
 {
-	if (no_images == 0) return;
+	if (no_images == 1) return;
 
 	current_bitmap = wxBitmap(images[currently_edited]);
 }
 
 void MyProject1MyFrame1::width_size_click(wxCommandEvent& event)
 {
-	if (no_images == 0) return;
+	if (no_images == 1) return;
 
 	wxSize panel_size{ img_panel->GetSize() };
 	wxSize img_size{ images[currently_edited].GetSize() };
@@ -164,7 +169,7 @@ void MyProject1MyFrame1::width_size_click(wxCommandEvent& event)
 
 void MyProject1MyFrame1::height_size_click(wxCommandEvent& event)
 {
-	if (no_images == 0) return;
+	if (no_images == 1) return;
 
 	wxSize panel_size{ img_panel->GetSize() };
 	wxSize img_size{ images[currently_edited].GetSize() };
@@ -174,7 +179,7 @@ void MyProject1MyFrame1::height_size_click(wxCommandEvent& event)
 
 void MyProject1MyFrame1::fit_click(wxCommandEvent& event)
 {
-	if (no_images == 0) return;
+	if (no_images == 1) return;
 
 	wxSize panel_size{ img_panel->GetSize() };
 	wxSize img_size{ images[currently_edited].GetSize() };
@@ -186,74 +191,59 @@ void MyProject1MyFrame1::fit_click(wxCommandEvent& event)
 		height_size_click(event);
 }
 
-void MyProject1MyFrame1::m_bitmap1_click(wxMouseEvent& event)
-{
-	currently_edited = 0;
-	current_bitmap = wxBitmap(images[currently_edited]);
+void MyProject1MyFrame1::m_bitmap1_click(wxMouseEvent& event) {
+	switch_images(1);
 }
 
-void MyProject1MyFrame1::m_bitmap2_click(wxMouseEvent& event)
-{
-	currently_edited = 1;
-	current_bitmap = wxBitmap(images[currently_edited]);
+void MyProject1MyFrame1::m_bitmap2_click(wxMouseEvent& event) {
+	switch_images(2);
 }
 
-void MyProject1MyFrame1::m_bitmap3_click(wxMouseEvent& event)
-{
-	currently_edited = 2;
-	current_bitmap = wxBitmap(images[currently_edited]);
+void MyProject1MyFrame1::m_bitmap3_click(wxMouseEvent& event) {
+	switch_images(3);
 }
 
-void MyProject1MyFrame1::m_bitmap4_click(wxMouseEvent& event)
-{
-	currently_edited = 3;
-	current_bitmap = wxBitmap(images[currently_edited]);
+void MyProject1MyFrame1::m_bitmap4_click(wxMouseEvent& event) {
+	switch_images(4);
 }
 
-void MyProject1MyFrame1::m_bitmap5_click(wxMouseEvent& event)
-{
-	currently_edited = 4;
-	current_bitmap = wxBitmap(images[currently_edited]);
+void MyProject1MyFrame1::m_bitmap5_click(wxMouseEvent& event) {
+	switch_images(5);
 }
 
 void MyProject1MyFrame1::mouse_point_click(wxMouseEvent& event)
 {
-	if (mode == 1)
-	{
-		if (positions.size() == 0)
-		{
-			positions.emplace_back(wxPoint(event.GetX(), event.GetY()));
-			positions.emplace_back(wxPoint(event.GetX(), event.GetY()));
-		}
-		else
-		{
-			positions.insert(std::begin(positions) + positions.size() - 2, wxPoint(event.GetX(), event.GetY()));
-		}
+	if (patch_mode == 0) return;
+
+	double ratio{ static_cast<double>(images[currently_edited].GetWidth()) / current_bitmap.GetWidth() };
+
+	if (polygon.size() == 0) {
+		polygon.emplace_back(event.GetX(), event.GetY(), ratio);
+		polygon.emplace_back(event.GetX(), event.GetY(), ratio);
+	}
+	else {
+		polygon.emplace_back(event.GetX(), event.GetY(), ratio);
 	}
 }
 
-
-void MyProject1MyFrame1::movePositions(int shift, int y)
+void MyProject1MyFrame1::movePositions(int shift, bool direction)
 {
-	for (wxPoint& pt : positions) {
-		pt.y += (y == 0) ? shift : 0;
-		pt.x += (y == 1) ? shift : 0;
+	for (auto& pt : polygon) {
+		pt.y += direction ? shift : 0;
+		pt.x += direction ? shift : 0;
 	}
 }
-
-
-
 
 
 // Returns true if the point p lies inside the polygon[] with n vertices
-bool MyProject1MyFrame1::isInside(std::vector<wxPoint> polygon, int n, wxPoint& p)
+bool MyProject1MyFrame1::isInside(std::vector<Vertex> polygon, int n, Vertex& p)
 {
 	// There must be at least 3 vertices in polygon[]
 	if (n < 3)
 		return false;
 
 	// Create a point for line segment from p to infinite
-	wxPoint extreme(5000, p.y);
+	Vertex extreme{ 5000, p.y };
 
 	// Count intersections of the above line with sides of polygon
 	int count = 0, i = 0;
@@ -285,7 +275,7 @@ bool MyProject1MyFrame1::isInside(std::vector<wxPoint> polygon, int n, wxPoint& 
 // 0 --> p, q and r are collinear
 // 1 --> Clockwise
 // 2 --> Counterclockwise
-int MyProject1MyFrame1::orientation(wxPoint& p, wxPoint& q, wxPoint& r)
+int MyProject1MyFrame1::orientation(Vertex& p, Vertex& q, Vertex& r)
 {
 	int val = (q.y - p.y) * (r.x - q.x) -
 		(q.x - p.x) * (r.y - q.y);
@@ -297,7 +287,7 @@ int MyProject1MyFrame1::orientation(wxPoint& p, wxPoint& q, wxPoint& r)
 
 // The function that returns true if line segment 'p1q1'
 // and 'p2q2' intersect.
-bool MyProject1MyFrame1::doIntersect(wxPoint& p1, wxPoint& q1, wxPoint& p2, wxPoint& q2)
+bool MyProject1MyFrame1::doIntersect(Vertex& p1, Vertex& q1, Vertex& p2, Vertex& q2)
 {
 	// Find the four orientations needed for general and
 	// special cases
@@ -335,7 +325,7 @@ bool MyProject1MyFrame1::doIntersect(wxPoint& p1, wxPoint& q1, wxPoint& p2, wxPo
 
 // Given three collinear points p, q, r, the function checks if
 // point q lies on line segment 'pr'
-bool MyProject1MyFrame1::onSegment(wxPoint& p, wxPoint& q, wxPoint& r)
+bool MyProject1MyFrame1::onSegment(Vertex& p, Vertex& q, Vertex& r)
 {
 	if (q.x <= std::max(p.x, r.x) && q.x >= std::min(p.x, r.x) &&
 		q.y <= std::max(p.y, r.y) && q.y >= std::min(p.y, r.y))
@@ -343,43 +333,18 @@ bool MyProject1MyFrame1::onSegment(wxPoint& p, wxPoint& q, wxPoint& r)
 	return false;
 }
 
-void MyProject1MyFrame1::swap(int ind)
+void MyProject1MyFrame1::iteratePoints(std::vector<Vertex>& pos, size_t img)
 {
-	/*
-	currentBitmap = ind;
-	int newIndex = ind;
+	if (pos.empty()) return;
 
-	wxBitmap first = this->bitmaps[0];
-	std::tuple<double, double> firstSize = this->originalSizes[0];
+	auto& pixels = images[0];
+	auto& pixelsNew = images[img];
 
-	this->bitmaps[0] = this->bitmaps[newIndex];
-	this->bitmaps[newIndex] = first;
-
-	this->originalSizes[0] = this->originalSizes[newIndex];
-	this->originalSizes[newIndex] = firstSize;
-	bitmapsC[0]->SetBitmap(wxBitmap(this->bitmaps[0].ConvertToImage().Scale(std::get<0>(this->originalSizes[0]) / 50, std::get<1>(this->originalSizes[0]) / 50)));
-
-	bitmapsC[newIndex]->SetBitmap(wxBitmap(this->bitmaps[newIndex].ConvertToImage().Scale(std::get<0>(this->originalSizes[newIndex]) / 50, std::get<1>(this->originalSizes[newIndex]) / 50)));
-	this->Update();*/
-}
-
-void MyProject1MyFrame1::iteratePoints(wxBitmap& bmp, wxBitmap& other, std::vector<wxPoint>& pos)
-{
-	if (!pos.empty())
-	{
-		auto pixels = bmp.ConvertToImage();
-		auto pixelsNew = other.ConvertToImage();
-
-		for (int i = 0; i < pixels.GetWidth(); i++)
-		{
-			for (int j = 0; j < pixels.GetHeight(); j++)
-			{
-				if (isInside(pos, 5, wxPoint(i, j)))
-				{
-					pixels.SetRGB(i, j, pixelsNew.GetRed(i, j), pixelsNew.GetGreen(i, j), pixelsNew.GetBlue(i, j));
-				}
+	for (int i = 0; i < pixels.GetWidth(); i++) {
+		for (int j = 0; j < pixels.GetHeight(); j++) {
+			if (isInside(pos, pos.size(), Vertex(i, j))) {
+				pixels.SetRGB(i, j, pixelsNew.GetRed(i, j), pixelsNew.GetGreen(i, j), pixelsNew.GetBlue(i, j));
 			}
 		}
-		bmp = wxBitmap(pixels);
 	}
 }
