@@ -10,9 +10,10 @@
 ## General info
 
 ## Technologies
-
+- wxWidgets
 ## Usage
 
 ## Updates
 
 - Single image patch completed <06-06-2022>
+- Basic functionality completed <17-06-2022>
