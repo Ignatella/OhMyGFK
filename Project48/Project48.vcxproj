@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>C:\Users\piter\Documents\CppProjects\Projekt\OhMyGFK\libs\wxWidgets\lib\vc_x64_lib;$(LibraryPath);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
-    <IncludePath>C:\Users\piter\Documents\CppProjects\Projekt\OhMyGFK\libs\wxWidgets\include\msvc;C:\Users\piter\Documents\CppProjects\Projekt\OhMyGFK\libs\wxWidgets\include;$(IncludePath);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+	<LibraryPath>..\libs\wxWidgets\lib\vc_x64_lib;$(LibraryPath);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+    <IncludePath>..\libs\wxWidgets\include\msvc;..\libs\wxWidgets\include;$(IncludePath);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LibraryPath>..\libs\wxWidgets\lib\vc_x64_lib;$(LibraryPath);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
