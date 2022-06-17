@@ -16,12 +16,13 @@ void MyProject1MyFrame1::switch_images(size_t new_image) {
 void MyProject1MyFrame1::apply_click(wxCommandEvent& event)
 {
 	if (all_polygons.empty()) return;
+	if (no_images == 1) return;
 
-	images[0] = images[currently_edited].Copy();
-	//works but not what we want!
+	images[0] = images[1].Copy();
 	for (auto& poly : all_polygons) {
 		iteratePoints(poly.first, poly.second);
 	}
+
 	switch_images(0);
 	this->Update();
 }
@@ -141,11 +142,11 @@ void MyProject1MyFrame1::patch_click(wxCommandEvent& event)
 	if (patch_mode) {
 		all_polygons.emplace_back(polygon, currently_edited);
 		polygon.clear();
-		apply_button->Disable();
+		apply_button->Enable();
 		patch_mode = false;
 	}
 	else {
-		apply_button->Enable();
+		apply_button->Disable();
 		patch_mode = true;
 	}
 }
