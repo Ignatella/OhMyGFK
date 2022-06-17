@@ -71,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-	<LibraryPath>..\libs\wxWidgets\lib\vc_x64_lib;$(LibraryPath);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+    <LibraryPath>..\libs\wxWidgets\lib\vc_x64_lib;$(LibraryPath);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
     <IncludePath>..\libs\wxWidgets\include\msvc;..\libs\wxWidgets\include;$(IncludePath);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -137,13 +137,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BaseFrame.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MyFrame1.cpp" />
-    <ClCompile Include="MyProject1MyFrame1.cpp" />
+    <ClCompile Include="AppFrame.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MyFrame1.h" />
-    <ClInclude Include="MyProject1MyFrame1.h" />
+    <ClInclude Include="BaseFrame.h" />
+    <ClInclude Include="AppFrame.h" />
+    <ClInclude Include="Polygon.h" />
+    <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

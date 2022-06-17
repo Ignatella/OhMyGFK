@@ -1,5 +1,6 @@
 #include <wx/wxprec.h>
-#include "MyProject1MyFrame1.h"
+#include "AppFrame.h"
+
 class MyApp : public wxApp
 {
 public:
@@ -10,7 +11,7 @@ wxIMPLEMENT_APP(MyApp);
 
 bool MyApp::OnInit()
 {
-	MyProject1MyFrame1* frame = new MyProject1MyFrame1(NULL);
+	AppFrame* frame = new AppFrame(NULL);
 	frame->Show(true);
 	SetTopWindow(frame);
 	return true;
