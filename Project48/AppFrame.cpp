@@ -224,13 +224,7 @@ void AppFrame::mouse_point_click(wxMouseEvent& event)
 
 	double ratio{ static_cast<double>(images[currently_edited].GetWidth()) / current_bitmap.GetWidth() };
 
-	if (polygon.size() == 0) {
-		polygon.emplace_back(event.GetX(), event.GetY(), ratio);
-		polygon.emplace_back(event.GetX(), event.GetY(), ratio);
-	}
-	else {
-		polygon.emplace_back(event.GetX(), event.GetY(), ratio);
-	}
+	polygon.emplace_back(event.GetX(), event.GetY(), ratio);
 }
 
 void AppFrame::movePositions(int shift, bool direction)
