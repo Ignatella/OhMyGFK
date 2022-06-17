@@ -1,5 +1,4 @@
 #include "MyProject1MyFrame1.h"
-#include <algorithm>
 
 MyProject1MyFrame1::MyProject1MyFrame1(wxWindow* parent)
 	:
@@ -18,9 +17,16 @@ void MyProject1MyFrame1::apply_click(wxCommandEvent& event)
 	if (all_polygons.empty()) return;
 	if (no_images == 1) return;
 
+	wxProgressDialog progress_dialog{ "Patching...", "Wait until patching is completed",
+		static_cast<int>(all_polygons.size()), this,
+		wxPD_APP_MODAL | wxPD_SMOOTH | wxPD_AUTO_HIDE };
+
 	images[0] = images[1].Copy();
+	// i want to use for(int value{}; auto& poly : all_polygons) {} :(
+	int value{};
 	for (auto& poly : all_polygons) {
 		iteratePoints(poly.first, poly.second);
+		progress_dialog.Update(++value);
 	}
 
 	switch_images(0);
@@ -338,11 +344,17 @@ void MyProject1MyFrame1::iteratePoints(std::vector<Vertex>& pos, size_t img)
 {
 	if (pos.empty()) return;
 
+	const int x_min{ static_cast<int>(std::min_element(pos.begin(), pos.end(), Vertex::less_in_x)->x) - 1 };
+	const int y_min{ static_cast<int>(std::min_element(pos.begin(), pos.end(), Vertex::less_in_y)->y) - 1 };
+	const int x_max{ static_cast<int>(std::min_element(pos.begin(), pos.end(), Vertex::greater_in_x)->x) + 1 };
+	const int y_max{ static_cast<int>(std::min_element(pos.begin(), pos.end(), Vertex::greater_in_y)->y) + 1 };
+
 	auto& pixels = images[0];
 	auto& pixelsNew = images[img];
 
-	for (int i = 0; i < pixels.GetWidth(); i++) {
-		for (int j = 0; j < pixels.GetHeight(); j++) {
+#pragma omp parallel
+	for (int i = x_min; i < x_max; i++) {
+		for (int j = y_min; j < y_max; j++) {
 			if (isInside(pos, pos.size(), Vertex(i, j))) {
 				pixels.SetRGB(i, j, pixelsNew.GetRed(i, j), pixelsNew.GetGreen(i, j), pixelsNew.GetBlue(i, j));
 			}
