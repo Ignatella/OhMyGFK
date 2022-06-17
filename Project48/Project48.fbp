@@ -999,6 +999,7 @@
                                         <property name="window_name"></property>
                                         <property name="window_style">wxHSCROLL|wxVSCROLL</property>
                                         <event name="OnLeftUp">mouse_point_click</event>
+                                        <event name="OnRightUp">panel_right_click</event>
                                     </object>
                                 </object>
                             </object>

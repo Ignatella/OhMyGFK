@@ -133,6 +133,7 @@ MyFrame1::MyFrame1(wxWindow* parent, wxWindowID id, const wxString& title, const
 	m_bitmap4->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(MyFrame1::m_bitmap4_click), NULL, this);
 	m_bitmap5->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(MyFrame1::m_bitmap5_click), NULL, this);
 	img_panel->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(MyFrame1::mouse_point_click), NULL, this);
+	img_panel->Connect(wxEVT_RIGHT_UP, wxMouseEventHandler(MyFrame1::panel_right_click), NULL, this);
 }
 
 MyFrame1::~MyFrame1()
@@ -152,5 +153,6 @@ MyFrame1::~MyFrame1()
 	m_bitmap4->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(MyFrame1::m_bitmap4_click), NULL, this);
 	m_bitmap5->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(MyFrame1::m_bitmap5_click), NULL, this);
 	img_panel->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(MyFrame1::mouse_point_click), NULL, this);
+	img_panel->Disconnect(wxEVT_RIGHT_UP, wxMouseEventHandler(MyFrame1::panel_right_click), NULL, this);
 
 }

@@ -70,11 +70,12 @@ protected:
 	virtual void m_bitmap4_click(wxMouseEvent& event) { event.Skip(); }
 	virtual void m_bitmap5_click(wxMouseEvent& event) { event.Skip(); }
 	virtual void mouse_point_click(wxMouseEvent& event) { event.Skip(); }
+	virtual void panel_right_click(wxMouseEvent& event) { event.Skip(); }
 
 
 public:
 
-	MyFrame1(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800, 600), long style = wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL);
+	MyFrame1(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = "Project 48- Foto Patchwork", const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800, 600), long style = wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL);
 
 	~MyFrame1();
 

@@ -46,6 +46,7 @@ protected:
 	void m_bitmap4_click(wxMouseEvent& event);
 	void m_bitmap5_click(wxMouseEvent& event);
 	void mouse_point_click(wxMouseEvent& event);
+	void panel_right_click(wxMouseEvent& event);
 
 public:
 	/** Constructor */

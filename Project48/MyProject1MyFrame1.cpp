@@ -135,7 +135,7 @@ void MyProject1MyFrame1::clear_pts_event(wxCommandEvent& event)
 
 void MyProject1MyFrame1::about_menu_authors_open(wxCommandEvent& event)
 {
-	wxMessageBox("Ignacy, Piotr, Szymon", "Authors", wxICON_INFORMATION);
+	wxMessageBox("Szymon Antkowiak\nIhnatsi Yermakovich\nPiotr Ptak", "Authors", wxICON_INFORMATION);
 }
 
 void MyProject1MyFrame1::patch_click(wxCommandEvent& event)
@@ -359,5 +359,11 @@ void MyProject1MyFrame1::iteratePoints(std::vector<Vertex>& pos, size_t img)
 				pixels.SetRGB(i, j, pixelsNew.GetRed(i, j), pixelsNew.GetGreen(i, j), pixelsNew.GetBlue(i, j));
 			}
 		}
+	}
+}
+
+void MyProject1MyFrame1::panel_right_click(wxMouseEvent& event) {
+	if (!polygon.empty()) {
+		polygon.pop_back();
 	}
 }
