@@ -44,25 +44,23 @@ MyFrame1::MyFrame1(wxWindow* parent, wxWindowID id, const wxString& title, const
 	wxBoxSizer* bSizer4;
 	bSizer4 = new wxBoxSizer(wxVERTICAL);
 
-	patch_button = new wxButton(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0);
-
-	patch_button->SetBitmap(wxBitmap(wxT("assets/icon.bmp"), wxBITMAP_TYPE_ANY));
-	bSizer4->Add(patch_button, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 5);
+	patch_button = new wxButton(this, wxID_ANY, wxT("Patch"), wxDefaultPosition, wxDefaultSize, 0);
+	bSizer4->Add(patch_button, 0, wxALL | wxEXPAND, 5);
 
 	apply_button = new wxButton(this, wxID_ANY, wxT("Apply changes"), wxDefaultPosition, wxDefaultSize, 0);
 	bSizer4->Add(apply_button, 0, wxALL | wxEXPAND, 5);
 
 	org_size_button = new wxButton(this, wxID_ANY, wxT("Original Size"), wxDefaultPosition, wxDefaultSize, 0);
-	bSizer4->Add(org_size_button, 0, wxALIGN_CENTER_HORIZONTAL | wxALL | wxEXPAND, 5);
+	bSizer4->Add(org_size_button, 0, wxALL | wxEXPAND, 5);
 
 	width_size_button = new wxButton(this, wxID_ANY, wxT("Fit Width"), wxDefaultPosition, wxDefaultSize, 0);
-	bSizer4->Add(width_size_button, 0, wxALIGN_CENTER_HORIZONTAL | wxALL | wxEXPAND, 5);
+	bSizer4->Add(width_size_button, 0, wxALL | wxEXPAND, 5);
 
 	height_button = new wxButton(this, wxID_ANY, wxT("Fit Height"), wxDefaultPosition, wxDefaultSize, 0);
-	bSizer4->Add(height_button, 0, wxALIGN_CENTER_HORIZONTAL | wxALL | wxEXPAND, 5);
+	bSizer4->Add(height_button, 0, wxALL | wxEXPAND, 5);
 
 	fit_button = new wxButton(this, wxID_ANY, wxT("Fit to Screen"), wxDefaultPosition, wxDefaultSize, 0);
-	bSizer4->Add(fit_button, 0, wxALIGN_CENTER_HORIZONTAL | wxALL | wxEXPAND, 5);
+	bSizer4->Add(fit_button, 0, wxALL | wxEXPAND, 5);
 
 
 	bSizer1->Add(bSizer4, 0, wxEXPAND, 5);
@@ -95,11 +93,17 @@ MyFrame1::MyFrame1(wxWindow* parent, wxWindowID id, const wxString& title, const
 
 	bSizer3->Add(bSizer2, 0, wxEXPAND, 5);
 
+	wxBoxSizer* bSizer5;
+	bSizer5 = new wxBoxSizer(wxVERTICAL);
+
 	img_panel = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL | wxVSCROLL);
 	img_panel->SetScrollRate(5, 5);
 	img_panel->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVEBORDER));
 
-	bSizer3->Add(img_panel, 1, wxEXPAND | wxALL, 5);
+	bSizer5->Add(img_panel, 1, wxEXPAND | wxALL, 5);
+
+
+	bSizer3->Add(bSizer5, 1, wxEXPAND, 5);
 
 
 	bSizer1->Add(bSizer3, 1, wxEXPAND, 5);
@@ -123,12 +127,12 @@ MyFrame1::MyFrame1(wxWindow* parent, wxWindowID id, const wxString& title, const
 	width_size_button->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame1::width_size_click), NULL, this);
 	height_button->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame1::height_size_click), NULL, this);
 	fit_button->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame1::fit_click), NULL, this);
-	m_bitmap1->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MyFrame1::m_bitmap1_click), NULL, this);
-	m_bitmap2->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MyFrame1::m_bitmap2_click), NULL, this);
-	m_bitmap3->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MyFrame1::m_bitmap3_click), NULL, this);
-	m_bitmap4->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MyFrame1::m_bitmap4_click), NULL, this);
-	m_bitmap5->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MyFrame1::m_bitmap5_click), NULL, this);
-	img_panel->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MyFrame1::mouse_point_click), NULL, this);
+	m_bitmap1->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(MyFrame1::m_bitmap1_click), NULL, this);
+	m_bitmap2->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(MyFrame1::m_bitmap2_click), NULL, this);
+	m_bitmap3->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(MyFrame1::m_bitmap3_click), NULL, this);
+	m_bitmap4->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(MyFrame1::m_bitmap4_click), NULL, this);
+	m_bitmap5->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(MyFrame1::m_bitmap5_click), NULL, this);
+	img_panel->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(MyFrame1::mouse_point_click), NULL, this);
 }
 
 MyFrame1::~MyFrame1()
@@ -142,11 +146,11 @@ MyFrame1::~MyFrame1()
 	width_size_button->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame1::width_size_click), NULL, this);
 	height_button->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame1::height_size_click), NULL, this);
 	fit_button->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame1::fit_click), NULL, this);
-	m_bitmap1->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MyFrame1::m_bitmap1_click), NULL, this);
-	m_bitmap2->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MyFrame1::m_bitmap2_click), NULL, this);
-	m_bitmap3->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MyFrame1::m_bitmap3_click), NULL, this);
-	m_bitmap4->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MyFrame1::m_bitmap4_click), NULL, this);
-	m_bitmap5->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MyFrame1::m_bitmap5_click), NULL, this);
-	img_panel->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MyFrame1::mouse_point_click), NULL, this);
+	m_bitmap1->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(MyFrame1::m_bitmap1_click), NULL, this);
+	m_bitmap2->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(MyFrame1::m_bitmap2_click), NULL, this);
+	m_bitmap3->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(MyFrame1::m_bitmap3_click), NULL, this);
+	m_bitmap4->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(MyFrame1::m_bitmap4_click), NULL, this);
+	m_bitmap5->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(MyFrame1::m_bitmap5_click), NULL, this);
+	img_panel->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(MyFrame1::mouse_point_click), NULL, this);
 
 }
