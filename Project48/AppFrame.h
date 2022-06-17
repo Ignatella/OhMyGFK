@@ -57,6 +57,7 @@ private:
 	// number of correct elements in images array (first is patched img)
 	size_t no_images{ 1 };
 	size_t currently_edited{};
+
 	std::array<wxStaticBitmap*, 5> miniatures = { m_bitmap1, m_bitmap2, m_bitmap3, m_bitmap4, m_bitmap5 };
 
 	// bitmap of currently displayed image

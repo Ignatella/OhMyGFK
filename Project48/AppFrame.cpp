@@ -8,6 +8,7 @@ AppFrame::AppFrame(wxWindow* parent) : BaseFrame(parent)
 }
 
 void AppFrame::switch_images(size_t new_image) {
+	if (patch_mode) return;
 	currently_edited = new_image;
 	org_size_click(wxCommandEvent());
 }
@@ -123,7 +124,7 @@ void AppFrame::save_file_save_event(wxCommandEvent& event)
 	}
 	catch (std::exception&)
 	{
-		wxMessageBox("Error while saving patched image!", "Error", wxICON_ERROR);
+	wxMessageBox("Error while saving patched image!", "Error", wxICON_ERROR);
 	}
 }
 
@@ -222,9 +223,14 @@ void AppFrame::mouse_point_click(wxMouseEvent& event)
 {
 	if (patch_mode == 0) return;
 
-	double ratio{ static_cast<double>(images[currently_edited].GetWidth()) / current_bitmap.GetWidth() };
+	if (event.GetX() > current_bitmap.GetWidth()  || event.GetY() > current_bitmap.GetHeight()) {
+		wxMessageBox("Cannot place the vertex outside the image boundaries", "Error", wxICON_ERROR);
+	}
+	else {
+		double ratio{ static_cast<double>(images[currently_edited].GetWidth()) / current_bitmap.GetWidth() };
 
-	polygon.emplace_back(event.GetX(), event.GetY(), ratio);
+		polygon.emplace_back(event.GetX(), event.GetY(), ratio);
+	}
 }
 
 void AppFrame::movePositions(int shift, bool direction)
