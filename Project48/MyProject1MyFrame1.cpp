@@ -28,8 +28,8 @@ void MyProject1MyFrame1::apply_click(wxCommandEvent& event)
 		iteratePoints(poly.first, poly.second);
 		progress_dialog.Update(++value);
 	}
-
 	switch_images(0);
+	images[1] = images[0];
 	this->Update();
 }
 
