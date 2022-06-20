@@ -30,7 +30,9 @@ void AppFrame::apply_click(wxCommandEvent& event)
 		progress_dialog.Update(++value);
 	}
 	switch_images(0);
-	images[1] = images[0];
+
+	images[1] = images[0].Copy();
+	
 	this->Update();
 }
 
@@ -106,6 +108,10 @@ void AppFrame::open_file_open_event(wxCommandEvent& event)
 	double ratio{ size.x / static_cast<double>(size.y) };
 	miniatures[no_images - 1]->SetBitmap(wxBitmap(img.Scale(static_cast<int>(50 * ratio), 50))); // Scale return new wxImage
 
+	if (no_images == 1) {
+		original_image = images[1];
+	}
+
 	++no_images;
 	switch_images(no_images - 1);
 
@@ -138,6 +144,16 @@ void AppFrame::about_menu_authors_open(wxCommandEvent& event)
 {
 	wxMessageBox("Szymon Antkowiak\nIhnatsi Yermakovich\nPiotr Ptak", "Authors", wxICON_INFORMATION);
 }
+
+void AppFrame::restore_img_click(wxCommandEvent& event) {
+	images[0] = original_image.Copy();
+	images[1] = original_image.Copy();
+	all_polygons.clear();
+
+	wxMessageBox("Original background restored","Restored", wxICON_INFORMATION);
+	this->Update();
+}
+
 
 void AppFrame::patch_click(wxCommandEvent& event)
 {

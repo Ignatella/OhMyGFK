@@ -57,6 +57,7 @@ protected:
 	virtual void open_file_open_event(wxCommandEvent& event) { event.Skip(); }
 	virtual void save_file_save_event(wxCommandEvent& event) { event.Skip(); }
 	virtual void clear_pts_event(wxCommandEvent& event) { event.Skip(); }
+	virtual void restore_img_click(wxCommandEvent& event) { event.Skip(); }
 	virtual void about_menu_authors_open(wxCommandEvent& event) { event.Skip(); }
 	virtual void patch_click(wxCommandEvent& event) { event.Skip(); }
 	virtual void apply_click(wxCommandEvent& event) { event.Skip(); }
@@ -75,7 +76,7 @@ protected:
 
 public:
 
-	BaseFrame(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800, 600), long style = wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL);
+	BaseFrame(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = "Project 48- Foto Patchwork", const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800, 600), long style = wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL);
 
 	~BaseFrame();
 

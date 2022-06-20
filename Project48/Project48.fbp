@@ -80,7 +80,7 @@
                 <property name="window_extra_style"></property>
                 <property name="window_name"></property>
                 <property name="window_style"></property>
-                <object class="wxMenu" expanded="0">
+                <object class="wxMenu" expanded="1">
                     <property name="label">File</property>
                     <property name="name">file_menu</property>
                     <property name="permission">protected</property>
@@ -112,6 +112,10 @@
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection">save_file_save_event</event>
                     </object>
+                    <object class="separator" expanded="1">
+                        <property name="name">file_menu_separator</property>
+                        <property name="permission">none</property>
+                    </object>
                     <object class="wxMenuItem" expanded="0">
                         <property name="bitmap"></property>
                         <property name="checked">0</property>
@@ -126,8 +130,22 @@
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection">clear_pts_event</event>
                     </object>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
+                        <property name="id">wxID_ANY</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">Restore first image</property>
+                        <property name="name">file_menu_restore_first_img</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut">Ctrl+R</property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">restore_img_click</event>
+                    </object>
                 </object>
-                <object class="wxMenu" expanded="1">
+                <object class="wxMenu" expanded="0">
                     <property name="label">About</property>
                     <property name="name">about_menu</property>
                     <property name="permission">protected</property>
@@ -147,7 +165,7 @@
                     </object>
                 </object>
             </object>
-            <object class="wxBoxSizer" expanded="1">
+            <object class="wxBoxSizer" expanded="0">
                 <property name="minimum_size">-1,-1</property>
                 <property name="name">bSizer1</property>
                 <property name="orient">wxHORIZONTAL</property>
@@ -161,11 +179,11 @@
                         <property name="name">bSizer4</property>
                         <property name="orient">wxVERTICAL</property>
                         <property name="permission">none</property>
-                        <object class="sizeritem" expanded="1">
+                        <object class="sizeritem" expanded="0">
                             <property name="border">5</property>
                             <property name="flag">wxALL|wxEXPAND</property>
                             <property name="proportion">0</property>
-                            <object class="wxButton" expanded="1">
+                            <object class="wxButton" expanded="0">
                                 <property name="BottomDockable">1</property>
                                 <property name="LeftDockable">1</property>
                                 <property name="RightDockable">1</property>
@@ -607,20 +625,20 @@
                         </object>
                     </object>
                 </object>
-                <object class="sizeritem" expanded="1">
+                <object class="sizeritem" expanded="0">
                     <property name="border">5</property>
                     <property name="flag">wxEXPAND</property>
                     <property name="proportion">1</property>
-                    <object class="wxBoxSizer" expanded="1">
+                    <object class="wxBoxSizer" expanded="0">
                         <property name="minimum_size"></property>
                         <property name="name">bSizer3</property>
                         <property name="orient">wxVERTICAL</property>
                         <property name="permission">none</property>
-                        <object class="sizeritem" expanded="1">
+                        <object class="sizeritem" expanded="0">
                             <property name="border">5</property>
                             <property name="flag">wxEXPAND</property>
                             <property name="proportion">0</property>
-                            <object class="wxBoxSizer" expanded="1">
+                            <object class="wxBoxSizer" expanded="0">
                                 <property name="minimum_size">-1,60</property>
                                 <property name="name">bSizer2</property>
                                 <property name="orient">wxHORIZONTAL</property>
@@ -684,11 +702,11 @@
                                         <event name="OnLeftUp">m_bitmap1_click</event>
                                     </object>
                                 </object>
-                                <object class="sizeritem" expanded="1">
+                                <object class="sizeritem" expanded="0">
                                     <property name="border">5</property>
                                     <property name="flag">wxEXPAND</property>
                                     <property name="proportion">0</property>
-                                    <object class="spacer" expanded="1">
+                                    <object class="spacer" expanded="0">
                                         <property name="height">0</property>
                                         <property name="permission">protected</property>
                                         <property name="width">20</property>
@@ -932,11 +950,11 @@
                                 </object>
                             </object>
                         </object>
-                        <object class="sizeritem" expanded="1">
+                        <object class="sizeritem" expanded="0">
                             <property name="border">5</property>
                             <property name="flag">wxEXPAND</property>
                             <property name="proportion">1</property>
-                            <object class="wxBoxSizer" expanded="1">
+                            <object class="wxBoxSizer" expanded="0">
                                 <property name="minimum_size"></property>
                                 <property name="name">bSizer5</property>
                                 <property name="orient">wxVERTICAL</property>
