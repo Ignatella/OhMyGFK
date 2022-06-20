@@ -19,7 +19,7 @@ The project made by [Ignatella](https://github.com/Ignatella), [ptakpiotr](https
 
 Here is the example of the result that can be achieved using the app:
 
-![Example]()
+![Example](https://raw.githubusercontent.com/Ignatella/OhMyGFK/develop/example.png)
 
 ```diff
 - Important! Program works on the Windows machine
