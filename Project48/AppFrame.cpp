@@ -9,8 +9,36 @@ AppFrame::AppFrame(wxWindow* parent) : BaseFrame(parent)
 
 void AppFrame::switch_images(size_t new_image) {
 	if (patch_mode) return;
+	if (no_images == 1) return;
+
 	currently_edited = new_image;
-	org_size_click(wxCommandEvent());
+
+	wxSize panel_size{ img_panel->GetSize() };
+	wxSize img_size{ images[currently_edited].GetSize() };
+	double ratio{ img_size.x / static_cast<double>(img_size.y) };
+
+	if (display_mode == display_modes::fit) {
+		display_mode = (img_size.x * panel_size.y > img_size.y * panel_size.x)
+			? display_modes::width
+			: display_modes::heigh;
+	}
+
+	switch (display_mode) {
+	case AppFrame::display_modes::original:
+		current_bitmap = wxBitmap(images[currently_edited]);
+		break;
+	case AppFrame::display_modes::heigh:
+		current_bitmap = wxBitmap(images[currently_edited].Scale(static_cast<int>(panel_size.y * ratio), panel_size.y));
+		display_mode = display_modes::heigh;
+		break;
+	case AppFrame::display_modes::width:
+		current_bitmap = wxBitmap(images[currently_edited].Scale(panel_size.x, static_cast<int>(panel_size.x / ratio)));
+		display_mode = display_modes::width;
+		break;
+	case AppFrame::display_modes::fit:
+		// should't get here
+		break;
+	}
 }
 
 void AppFrame::apply_click(wxCommandEvent& event)
@@ -150,6 +178,8 @@ void AppFrame::restore_img_click(wxCommandEvent& event) {
 	images[1] = original_image.Copy();
 	all_polygons.clear();
 
+	switch_images(1);
+
 	wxMessageBox("Original background restored", "Restored", wxICON_INFORMATION);
 	this->Update();
 }
@@ -174,45 +204,24 @@ void AppFrame::patch_click(wxCommandEvent& event)
 	}
 }
 
-void AppFrame::org_size_click(wxCommandEvent& event)
-{
-	if (no_images == 1) return;
-
-	current_bitmap = wxBitmap(images[currently_edited]);
+void AppFrame::org_size_click(wxCommandEvent& event) {
+	display_mode = display_modes::original;
+	switch_images(currently_edited);
 }
 
-void AppFrame::width_size_click(wxCommandEvent& event)
-{
-	if (no_images == 1) return;
-
-	wxSize panel_size{ img_panel->GetSize() };
-	wxSize img_size{ images[currently_edited].GetSize() };
-	double ratio{ img_size.x / static_cast<double>(img_size.y) };
-	current_bitmap = wxBitmap(images[currently_edited].Scale(panel_size.x, static_cast<int>(panel_size.x / ratio)));
+void AppFrame::width_size_click(wxCommandEvent& event) {
+	display_mode = display_modes::width;
+	switch_images(currently_edited);
 }
 
-void AppFrame::height_size_click(wxCommandEvent& event)
-{
-	if (no_images == 1) return;
-
-	wxSize panel_size{ img_panel->GetSize() };
-	wxSize img_size{ images[currently_edited].GetSize() };
-	double ratio{ img_size.x / static_cast<double>(img_size.y) };
-	current_bitmap = wxBitmap(images[currently_edited].Scale(static_cast<int>(panel_size.y * ratio), panel_size.y));
+void AppFrame::height_size_click(wxCommandEvent& event) {
+	display_mode = display_modes::heigh;
+	switch_images(currently_edited);
 }
 
-void AppFrame::fit_click(wxCommandEvent& event)
-{
-	if (no_images == 1) return;
-
-	wxSize panel_size{ img_panel->GetSize() };
-	wxSize img_size{ images[currently_edited].GetSize() };
-	double ratio{ img_size.x / static_cast<double>(img_size.y) };
-
-	if (img_size.x * panel_size.y > img_size.y * panel_size.x)
-		width_size_click(event);
-	else
-		height_size_click(event);
+void AppFrame::fit_click(wxCommandEvent& event) {
+	display_mode = display_modes::fit;
+	switch_images(currently_edited);
 }
 
 void AppFrame::m_bitmap1_click(wxMouseEvent& event) {
