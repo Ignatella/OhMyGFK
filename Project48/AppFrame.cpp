@@ -91,7 +91,7 @@ void AppFrame::on_update(wxUpdateUIEvent& event)
 
 void AppFrame::open_file_open_event(wxCommandEvent& event)
 {
-	if (no_images > 6) {
+	if (no_images >= 6) {
 		wxMessageBox("Maximum images count exceeded", "Error", wxICON_ERROR);
 		return;
 	}
