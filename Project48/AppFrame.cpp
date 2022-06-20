@@ -32,7 +32,7 @@ void AppFrame::apply_click(wxCommandEvent& event)
 	switch_images(0);
 
 	images[1] = images[0].Copy();
-	
+
 	this->Update();
 }
 
@@ -130,7 +130,7 @@ void AppFrame::save_file_save_event(wxCommandEvent& event)
 	}
 	catch (std::exception&)
 	{
-	wxMessageBox("Error while saving patched image!", "Error", wxICON_ERROR);
+		wxMessageBox("Error while saving patched image!", "Error", wxICON_ERROR);
 	}
 }
 
@@ -150,7 +150,7 @@ void AppFrame::restore_img_click(wxCommandEvent& event) {
 	images[1] = original_image.Copy();
 	all_polygons.clear();
 
-	wxMessageBox("Original background restored","Restored", wxICON_INFORMATION);
+	wxMessageBox("Original background restored", "Restored", wxICON_INFORMATION);
 	this->Update();
 }
 
@@ -239,7 +239,7 @@ void AppFrame::mouse_point_click(wxMouseEvent& event)
 {
 	if (patch_mode == 0) return;
 
-	if (event.GetX() > current_bitmap.GetWidth()  || event.GetY() > current_bitmap.GetHeight()) {
+	if (event.GetX() > current_bitmap.GetWidth() || event.GetY() > current_bitmap.GetHeight()) {
 		wxMessageBox("Cannot place the vertex outside the image boundaries", "Error", wxICON_ERROR);
 	}
 	else {
@@ -262,19 +262,28 @@ void AppFrame::iteratePoints(std::vector<Vertex>& pos, size_t img)
 {
 	if (pos.empty()) return;
 
-	const int x_min{ static_cast<int>(std::min_element(pos.begin(), pos.end(), Vertex::less_in_x)->x) - 1 };
-	const int y_min{ static_cast<int>(std::min_element(pos.begin(), pos.end(), Vertex::less_in_y)->y) - 1 };
-	const int x_max{ static_cast<int>(std::min_element(pos.begin(), pos.end(), Vertex::greater_in_x)->x) + 1 };
-	const int y_max{ static_cast<int>(std::min_element(pos.begin(), pos.end(), Vertex::greater_in_y)->y) + 1 };
+	const wxSize size{ images[0].GetSize() };
+	const wxSize sizeNew{ images[img].GetSize() };
 
-	auto& pixels = images[0];
-	auto& pixelsNew = images[img];
+	// founds bounds of interesting area, protects again patching bigger image into smaller
+	const int x_min{ std::min(static_cast<int>(std::min_element(pos.begin(), pos.end(), Vertex::less_in_x)->x) - 1, size.x) };
+	const int y_min{ std::min(static_cast<int>(std::min_element(pos.begin(), pos.end(), Vertex::less_in_y)->y) - 1, size.y) };
+	const int x_max{ std::min(static_cast<int>(std::min_element(pos.begin(), pos.end(), Vertex::greater_in_x)->x) + 1, size.x) };
+	const int y_max{ std::min(static_cast<int>(std::min_element(pos.begin(), pos.end(), Vertex::greater_in_y)->y) + 1, size.y) };
+
+	unsigned char* const pixels = images[0].GetData();
+	unsigned char* const pixelsNew = images[img].GetData();
+
 
 #pragma omp parallel
 	for (int i = x_min; i < x_max; i++) {
 		for (int j = y_min; j < y_max; j++) {
 			if (Polygon::isInside(pos, pos.size(), Vertex(i, j))) {
-				pixels.SetRGB(i, j, pixelsNew.GetRed(i, j), pixelsNew.GetGreen(i, j), pixelsNew.GetBlue(i, j));
+				unsigned char* const color = pixels + 3 * (size.x * j + i);
+				unsigned char* const colorNew = pixelsNew + 3 * (sizeNew.x * j + i);
+				color[0] = (color[0] + colorNew[0]) / 2;
+				color[1] = (color[1] + colorNew[1]) / 2;
+				color[2] = (color[2] + colorNew[2]) / 2;
 			}
 		}
 	}
