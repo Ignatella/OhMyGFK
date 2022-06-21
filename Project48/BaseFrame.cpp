@@ -40,6 +40,10 @@ BaseFrame::BaseFrame(wxWindow* parent, wxWindowID id, const wxString& title, con
 	about_menu_authors = new wxMenuItem(about_menu, wxID_ANY, wxString(wxT("Authors")) + wxT('\t') + wxT("Ctrl+A"), wxEmptyString, wxITEM_NORMAL);
 	about_menu->Append(about_menu_authors);
 
+	wxMenuItem* about_menu_license;
+	about_menu_license = new wxMenuItem(about_menu, wxID_ANY, wxString(wxT("License")) + wxT('\t') + wxT("CTRL  + L"), wxEmptyString, wxITEM_NORMAL);
+	about_menu->Append(about_menu_license);
+
 	m_menubar1->Append(about_menu, wxT("About"));
 
 	this->SetMenuBar(m_menubar1);
@@ -128,6 +132,7 @@ BaseFrame::BaseFrame(wxWindow* parent, wxWindowID id, const wxString& title, con
 	file_menu->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(BaseFrame::clear_pts_event), this, file_menu_clear_pts->GetId());
 	file_menu->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(BaseFrame::restore_img_click), this, file_menu_restore_first_img->GetId());
 	about_menu->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(BaseFrame::about_menu_authors_open), this, about_menu_authors->GetId());
+	about_menu->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(BaseFrame::about_menu_license_open), this, about_menu_license->GetId());
 	patch_button->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseFrame::patch_click), NULL, this);
 	apply_button->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseFrame::apply_click), NULL, this);
 	org_size_button->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseFrame::org_size_click), NULL, this);

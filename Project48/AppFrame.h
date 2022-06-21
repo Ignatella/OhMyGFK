@@ -58,6 +58,12 @@ protected:
 	 */
 	void about_menu_authors_open(wxCommandEvent& event);
 	/**
+	 * @brief method that handles about menu submenu click (displays wxMessageBox with license of the app)
+	 *
+	 * @param event
+	 */
+	void about_menu_license_open(wxCommandEvent& event);
+	/**
 	 * @brief method that restores the patched image to its initial state
 	 *
 	 * @param event

@@ -173,6 +173,11 @@ void AppFrame::about_menu_authors_open(wxCommandEvent& event)
 	wxMessageBox("Szymon Antkowiak\nIhnatsi Yermakovich\nPiotr Ptak", "Authors", wxICON_INFORMATION);
 }
 
+void AppFrame::about_menu_license_open(wxCommandEvent& event)
+{
+	wxMessageBox("App is distributed under the following license:\n\n1) App - GNU GENERAL PUBLIC LICENSE Version 3\n2) wxWidgets - wxWindows Free Documentation Licence, Version 3", "License", wxICON_INFORMATION);
+}
+
 void AppFrame::restore_img_click(wxCommandEvent& event) {
 	images[0] = original_image.Copy();
 	images[1] = original_image.Copy();

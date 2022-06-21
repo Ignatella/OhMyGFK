@@ -145,7 +145,7 @@
                         <event name="OnMenuSelection">restore_img_click</event>
                     </object>
                 </object>
-                <object class="wxMenu" expanded="0">
+                <object class="wxMenu" expanded="1">
                     <property name="label">About</property>
                     <property name="name">about_menu</property>
                     <property name="permission">protected</property>
@@ -162,6 +162,20 @@
                         <property name="shortcut">Ctrl+A</property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection">about_menu_authors_open</event>
+                    </object>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
+                        <property name="id">wxID_ANY</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">License</property>
+                        <property name="name">about_menu_license</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut">CTRL  + L</property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">about_menu_license_open</event>
                     </object>
                 </object>
             </object>
