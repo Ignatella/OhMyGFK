@@ -9,8 +9,36 @@ AppFrame::AppFrame(wxWindow* parent) : BaseFrame(parent)
 
 void AppFrame::switch_images(size_t new_image) {
 	if (patch_mode) return;
+	if (no_images == 1) return;
+
 	currently_edited = new_image;
-	org_size_click(wxCommandEvent());
+
+	wxSize panel_size{ img_panel->GetSize() };
+	wxSize img_size{ images[currently_edited].GetSize() };
+	double ratio{ img_size.x / static_cast<double>(img_size.y) };
+
+	if (display_mode == display_modes::fit) {
+		display_mode = (img_size.x * panel_size.y > img_size.y * panel_size.x)
+			? display_modes::width
+			: display_modes::heigh;
+	}
+
+	switch (display_mode) {
+	case AppFrame::display_modes::original:
+		current_bitmap = wxBitmap(images[currently_edited]);
+		break;
+	case AppFrame::display_modes::heigh:
+		current_bitmap = wxBitmap(images[currently_edited].Scale(static_cast<int>(panel_size.y * ratio), panel_size.y));
+		display_mode = display_modes::heigh;
+		break;
+	case AppFrame::display_modes::width:
+		current_bitmap = wxBitmap(images[currently_edited].Scale(panel_size.x, static_cast<int>(panel_size.x / ratio)));
+		display_mode = display_modes::width;
+		break;
+	case AppFrame::display_modes::fit:
+		// should't get here
+		break;
+	}
 }
 
 void AppFrame::apply_click(wxCommandEvent& event)
@@ -32,7 +60,7 @@ void AppFrame::apply_click(wxCommandEvent& event)
 	switch_images(0);
 
 	images[1] = images[0].Copy();
-	
+
 	this->Update();
 }
 
@@ -130,7 +158,7 @@ void AppFrame::save_file_save_event(wxCommandEvent& event)
 	}
 	catch (std::exception&)
 	{
-	wxMessageBox("Error while saving patched image!", "Error", wxICON_ERROR);
+		wxMessageBox("Error while saving patched image!", "Error", wxICON_ERROR);
 	}
 }
 
@@ -150,7 +178,9 @@ void AppFrame::restore_img_click(wxCommandEvent& event) {
 	images[1] = original_image.Copy();
 	all_polygons.clear();
 
-	wxMessageBox("Original background restored","Restored", wxICON_INFORMATION);
+	switch_images(1);
+
+	wxMessageBox("Original background restored", "Restored", wxICON_INFORMATION);
 	this->Update();
 }
 
@@ -174,45 +204,24 @@ void AppFrame::patch_click(wxCommandEvent& event)
 	}
 }
 
-void AppFrame::org_size_click(wxCommandEvent& event)
-{
-	if (no_images == 1) return;
-
-	current_bitmap = wxBitmap(images[currently_edited]);
+void AppFrame::org_size_click(wxCommandEvent& event) {
+	display_mode = display_modes::original;
+	switch_images(currently_edited);
 }
 
-void AppFrame::width_size_click(wxCommandEvent& event)
-{
-	if (no_images == 1) return;
-
-	wxSize panel_size{ img_panel->GetSize() };
-	wxSize img_size{ images[currently_edited].GetSize() };
-	double ratio{ img_size.x / static_cast<double>(img_size.y) };
-	current_bitmap = wxBitmap(images[currently_edited].Scale(panel_size.x, static_cast<int>(panel_size.x / ratio)));
+void AppFrame::width_size_click(wxCommandEvent& event) {
+	display_mode = display_modes::width;
+	switch_images(currently_edited);
 }
 
-void AppFrame::height_size_click(wxCommandEvent& event)
-{
-	if (no_images == 1) return;
-
-	wxSize panel_size{ img_panel->GetSize() };
-	wxSize img_size{ images[currently_edited].GetSize() };
-	double ratio{ img_size.x / static_cast<double>(img_size.y) };
-	current_bitmap = wxBitmap(images[currently_edited].Scale(static_cast<int>(panel_size.y * ratio), panel_size.y));
+void AppFrame::height_size_click(wxCommandEvent& event) {
+	display_mode = display_modes::heigh;
+	switch_images(currently_edited);
 }
 
-void AppFrame::fit_click(wxCommandEvent& event)
-{
-	if (no_images == 1) return;
-
-	wxSize panel_size{ img_panel->GetSize() };
-	wxSize img_size{ images[currently_edited].GetSize() };
-	double ratio{ img_size.x / static_cast<double>(img_size.y) };
-
-	if (img_size.x * panel_size.y > img_size.y * panel_size.x)
-		width_size_click(event);
-	else
-		height_size_click(event);
+void AppFrame::fit_click(wxCommandEvent& event) {
+	display_mode = display_modes::fit;
+	switch_images(currently_edited);
 }
 
 void AppFrame::m_bitmap1_click(wxMouseEvent& event) {
@@ -239,7 +248,7 @@ void AppFrame::mouse_point_click(wxMouseEvent& event)
 {
 	if (patch_mode == 0) return;
 
-	if (event.GetX() > current_bitmap.GetWidth()  || event.GetY() > current_bitmap.GetHeight()) {
+	if (event.GetX() > current_bitmap.GetWidth() || event.GetY() > current_bitmap.GetHeight()) {
 		wxMessageBox("Cannot place the vertex outside the image boundaries", "Error", wxICON_ERROR);
 	}
 	else {
@@ -262,19 +271,28 @@ void AppFrame::iteratePoints(std::vector<Vertex>& pos, size_t img)
 {
 	if (pos.empty()) return;
 
-	const int x_min{ static_cast<int>(std::min_element(pos.begin(), pos.end(), Vertex::less_in_x)->x) - 1 };
-	const int y_min{ static_cast<int>(std::min_element(pos.begin(), pos.end(), Vertex::less_in_y)->y) - 1 };
-	const int x_max{ static_cast<int>(std::min_element(pos.begin(), pos.end(), Vertex::greater_in_x)->x) + 1 };
-	const int y_max{ static_cast<int>(std::min_element(pos.begin(), pos.end(), Vertex::greater_in_y)->y) + 1 };
+	const wxSize size{ images[0].GetSize() };
+	const wxSize sizeNew{ images[img].GetSize() };
 
-	auto& pixels = images[0];
-	auto& pixelsNew = images[img];
+	// founds bounds of interesting area, protects again patching bigger image into smaller
+	const int x_min{ std::min(static_cast<int>(std::min_element(pos.begin(), pos.end(), Vertex::less_in_x)->x) - 1, size.x) };
+	const int y_min{ std::min(static_cast<int>(std::min_element(pos.begin(), pos.end(), Vertex::less_in_y)->y) - 1, size.y) };
+	const int x_max{ std::min(static_cast<int>(std::min_element(pos.begin(), pos.end(), Vertex::greater_in_x)->x) + 1, size.x) };
+	const int y_max{ std::min(static_cast<int>(std::min_element(pos.begin(), pos.end(), Vertex::greater_in_y)->y) + 1, size.y) };
+
+	unsigned char* const pixels = images[0].GetData();
+	unsigned char* const pixelsNew = images[img].GetData();
+
 
 #pragma omp parallel
 	for (int i = x_min; i < x_max; i++) {
 		for (int j = y_min; j < y_max; j++) {
 			if (Polygon::isInside(pos, pos.size(), Vertex(i, j))) {
-				pixels.SetRGB(i, j, pixelsNew.GetRed(i, j), pixelsNew.GetGreen(i, j), pixelsNew.GetBlue(i, j));
+				unsigned char* const color = pixels + 3 * (size.x * j + i);
+				unsigned char* const colorNew = pixelsNew + 3 * (sizeNew.x * j + i);
+				color[0] = (color[0] + colorNew[0]) / 2;
+				color[1] = (color[1] + colorNew[1]) / 2;
+				color[2] = (color[2] + colorNew[2]) / 2;
 			}
 		}
 	}
