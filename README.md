@@ -11,6 +11,10 @@
 
 The project made by [Ignatella](https://github.com/Ignatella), [ptakpiotr](https://github.com/ptakpiotr) and [Szynkaa](https://github.com/Szynkaa) for Fundamentals of Computer Graphics.
 
+## License 
+
+This software is distributed under the GNU GENERAL PUBLIC LICENSE Version 3.
+
 ## Technologies
 
 - wxWidgets (C++)
